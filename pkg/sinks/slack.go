@@ -99,7 +99,7 @@ func (s *SlackSink) Emit(results v1alpha1.ResultSpec) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	//req.Header.Set("Authorization")
+	//req.Header.Set("Authorization",)
 
 	resp, err := s.Client.hclient.Do(req)
 	if err != nil {
