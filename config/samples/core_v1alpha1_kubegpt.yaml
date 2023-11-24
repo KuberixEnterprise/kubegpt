@@ -18,4 +18,4 @@ spec:
       key: "openai-api-key"
   sink:
     type: "slack"
-    endpoint: "https://hooks.slack.com/services/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"
+    endpoint: "https://hooks.slack.com/services/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"
