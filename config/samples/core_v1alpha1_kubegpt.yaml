@@ -1,0 +1,21 @@
+apiVersion: core.test.kubebuilder.io/v1alpha1
+kind: Kubegpt
+metadata:
+  labels:
+    app.kubernetes.io/name: kubegpt
+    app.kubernetes.io/instance: kubegpt-sample
+    app.kubernetes.io/part-of: kubebilder-test
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kubebilder-test
+  name: kubegpt-sample
+  namespace: kubegpt
+spec:
+  ai:
+    backend: "openai"
+    model: "gpt-4-1106-preview"
+    secret:
+      name: "kubegpt-secret"
+      key: "openai-api-key"
+  sink:
+    type: "slack"
+    endpoint: "https://hooks.slack.com/services/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"

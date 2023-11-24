@@ -1,0 +1,27 @@
+# permissions for end users to view allresources.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: allresource-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: kubebilder-test
+    app.kubernetes.io/part-of: kubebilder-test
+    app.kubernetes.io/managed-by: kustomize
+  name: allresource-viewer-role
+rules:
+- apiGroups:
+  - core.test.kubebuilder.io
+  resources:
+  - allresources
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.test.kubebuilder.io
+  resources:
+  - allresources/status
+  verbs:
+  - get
