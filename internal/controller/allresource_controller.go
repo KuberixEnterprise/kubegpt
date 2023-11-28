@@ -70,7 +70,7 @@ func (r *AllResourceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	resultList := &corev1alpha1.ResultList{}
 
 	for _, event := range events.Items {
-		if event.Type == "Warning" && event.Regarding.Kind == "Pod" {
+		if event.Type == "Normal" && event.Regarding.Kind == "Pod" {
 			pod := &v1.Pod{}
 			if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod); err != nil {
 				l.Error(err, "Pod 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
