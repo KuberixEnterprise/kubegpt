@@ -5,32 +5,6 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - ""
-  resources:
-  - allresources
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - allresources/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - allresources/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
   - core.test.kubebuilder.io
   resources:
   - kubegpts
