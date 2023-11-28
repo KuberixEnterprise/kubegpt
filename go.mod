@@ -99,4 +99,5 @@ require (
 	github.com/KuberixEnterprise/kubegpt/pkg/integrations   v0.0.0-20211013104910-8f9b9e2e2e8a
 	github.com/KuberixEnterprise/kubegpt/pkg/resources      v0.0.0-20211013104910-8f9b9e2e2e8a
 	github.com/KuberixEnterprise/kubegpt/pkg/sinks		  v0.0.0-20211013104910-8f9b9e2e2e8a
+	github.com/KuberixEnterprise/kubegpt/internal/controllers v0.0.0-20211013104910-8f9b9e2e2e8a
 )
