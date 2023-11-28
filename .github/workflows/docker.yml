@@ -1,18 +1,15 @@
-name: Docker
+name: Build and Push Docker Image to GitHub Registry
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  push:
+  docker-buildx:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
-      - name: Check Out Repo
+      - name: Check Out Repository
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
@@ -23,18 +20,14 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.TOKEN }}
 
-      - name: Build and Push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ghcr.io/kuberixenterprise/kubegpt/kubegpt:latest
-          platforms: linux/amd64,linux/arm64
+      - name: Run Makefile docker-buildx
+        run: make docker-buildx
+        env:
+          IMG: ghcr.io/kuberixenterprise/kubegpt:latest
+          PLATFORMS: linux/amd64,linux/arm64
+          CONTAINER_TOOL: docker
 
       - name: Cleanup
-        uses: docker/build-push-action@v3
-        with:
-          cleanup: true
+        run: docker buildx rm project-v3-builder
