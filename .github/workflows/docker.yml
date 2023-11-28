@@ -31,7 +31,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}/kubegpt:latest
+          tags: ghcr.io/kuberixenterprise/kubegpt/kubegpt:latest
           platforms: linux/amd64,linux/arm64
 
       - name: Cleanup
