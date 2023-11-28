@@ -6,7 +6,7 @@ domain: test.kubebuilder.io
 layout:
 - go.kubebuilder.io/v4
 projectName: kubebilder-test
-repo: github.com/KuberixEnterprise/kubegpt
+repo: github.com/kuberixenterprise/kubegpt
 resources:
 - api:
     crdVersion: v1
@@ -15,7 +15,7 @@ resources:
   domain: test.kubebuilder.io
   group: core
   kind: Result
-  path: github.com/KuberixEnterprise/kubegpt/api/v1alpha1
+  path: github.com/kuberixenterprise/kubegpt/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1

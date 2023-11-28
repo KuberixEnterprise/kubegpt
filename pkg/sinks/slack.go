@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
+	"github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )

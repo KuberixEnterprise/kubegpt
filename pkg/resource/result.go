@@ -2,7 +2,7 @@ package resource
 
 import (
 	"context"
-	"github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
+	"github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	// import to yaml

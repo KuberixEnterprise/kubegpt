@@ -18,9 +18,9 @@ package controller
 
 import (
 	"context"
-	"github.com/KuberixEnterprise/kubegpt/pkg/integrations"
-	"github.com/KuberixEnterprise/kubegpt/pkg/resource"
-	"github.com/KuberixEnterprise/kubegpt/pkg/sinks"
+	"github.com/kuberixenterprise/kubegpt/pkg/integrations"
+	"github.com/kuberixenterprise/kubegpt/pkg/resource"
+	"github.com/kuberixenterprise/kubegpt/pkg/sinks"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/api/events/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,7 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"time"
 
-	corev1alpha1 "github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
+	corev1alpha1 "github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 )
 
 // KubegptReconciler reconciles a Kubegpt object

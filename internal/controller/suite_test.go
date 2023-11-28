@@ -33,7 +33,7 @@ import (
 
 	"k8s.io/api/core/v1"
 
-	corev1alpha1 "github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
+	corev1alpha1 "github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 

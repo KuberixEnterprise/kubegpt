@@ -19,15 +19,15 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/KuberixEnterprise/kubegpt/pkg/integrations"
+	"github.com/kuberixenterprise/kubegpt/pkg/integrations"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
-	corev1alpha1 "github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
-	"github.com/KuberixEnterprise/kubegpt/internal/controller"
+	corev1alpha1 "github.com/kuberixenterprise/kubegpt/api/v1alpha1"
+	"github.com/kuberixenterprise/kubegpt/internal/controller"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"

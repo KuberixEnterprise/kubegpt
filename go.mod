@@ -1,4 +1,4 @@
-module github.com/KuberixEnterprise/kubegpt
+module github.com/kuberixenterprise/kubegpt
 
 go 1.20
 
@@ -96,8 +96,4 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.14.3-0.20230601165947-6ce0bf390ce3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
-	github.com/KuberixEnterprise/kubegpt/pkg/integrations   v0.0.1
-	github.com/KuberixEnterprise/kubegpt/pkg/resources      v0.0.1
-	github.com/KuberixEnterprise/kubegpt/pkg/sinks		 v0.0.1
-	github.com/KuberixEnterprise/kubegpt/internal/controllers v0.0.1
 )
