@@ -14,10 +14,10 @@
 #nameOverride: ""
 #fullnameOverride: ""
 secret:
-  secretKey: "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" # base64 encoded OpenAI token
+  secretKey: "" # base64 encoded OpenAI token
 
 slack:
-  webhook: "https://hooks.slack.com/services/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"
+  webhook: ""
 
 serviceAccount:
   # Specifies whether a service account should be created

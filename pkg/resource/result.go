@@ -2,9 +2,9 @@ package resource
 
 import (
 	"context"
+	"github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"test.kubebuilder.io/project/api/v1alpha1"
 	// import to yaml
 	//"k8s.io/apimachinery/pkg/runtime"
 	////"k8s.io/apimachinery/pkg/runtime/serializer/json"

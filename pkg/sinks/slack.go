@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"test.kubebuilder.io/project/api/v1alpha1"
 )
 
 type SlackSink struct {

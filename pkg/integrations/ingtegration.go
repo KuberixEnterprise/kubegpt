@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"test.kubebuilder.io/project/api/v1alpha1"
 )
 
 const (

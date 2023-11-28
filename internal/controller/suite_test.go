@@ -9,7 +9,6 @@ You may obtain a copy of the License at
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
@@ -34,8 +33,7 @@ import (
 
 	"k8s.io/api/core/v1"
 
-	corev1 "test.kubebuilder.io/project/api/v1"
-	corev1alpha1 "test.kubebuilder.io/project/api/v1alpha1"
+	corev1alpha1 "github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -74,9 +72,6 @@ var _ = BeforeSuite(func() {
 	cfg, err = testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
-
-	err = corev1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
 
 	err = corev1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())

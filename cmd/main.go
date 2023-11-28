@@ -19,23 +19,20 @@ package main
 import (
 	"context"
 	"flag"
-	"os"
-	"test.kubebuilder.io/project/pkg/integrations"
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-
+	"github.com/KuberixEnterprise/kubegpt/pkg/integrations"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"os"
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	corev1alpha1 "github.com/KuberixEnterprise/kubegpt/api/v1alpha1"
+	"github.com/KuberixEnterprise/kubegpt/internal/controller"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-
-	corev1 "test.kubebuilder.io/project/api/v1"
-	corev1alpha1 "test.kubebuilder.io/project/api/v1alpha1"
-	"test.kubebuilder.io/project/internal/controller"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -47,7 +44,6 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
-	utilruntime.Must(corev1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -91,23 +87,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controller.AllResourceReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AllResource")
-		os.Exit(1)
-	}
-	if err = (&controller.KubegptReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Kubegpt")
-		os.Exit(1)
-	}
 	integration, err := integrations.NewIntegrations(mgr.GetClient(), context.Background())
 	if err != nil {
 		setupLog.Error(err, "unable to create REST client to initialise Integrations")
+		os.Exit(1)
+	}
+
+	if err = (&controller.KubegptReconciler{
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		Integrations: integration,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Kubegpt")
 		os.Exit(1)
 	}
 
@@ -122,16 +113,6 @@ func main() {
 	//	os.Exit(1)
 	//}
 	//sinkClient := sinks.NewClient(sinkTimeout)
-
-	if err = (&controller.AllResourceReconciler{
-		Client:       mgr.GetClient(),
-		Scheme:       mgr.GetScheme(),
-		Integrations: integration,
-		//SinkClient:   sinkClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "K8sGPT")
-		os.Exit(1)
-	}
 
 	//+kubebuilder:scaffold:builder
 
