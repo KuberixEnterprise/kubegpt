@@ -39,13 +39,16 @@ helm.sh/chart: {{ include "kubegpt.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
+{{- end }}
 
 {{/*
 Selector labels
 */}}
 {{- define "kubegpt.selectorLabels" -}}
+helm.sh/chart: {{ include "kubegpt.chart" . }}
 app.kubernetes.io/name: {{ include "kubegpt.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*

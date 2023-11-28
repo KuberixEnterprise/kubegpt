@@ -1,0 +1,17 @@
+apiVersion: core.test.kubebuilder.io/v1alpha1
+kind: Kubegpt
+metadata:
+  labels:
+  {{- include "kubegpt.labels" . | nindent 4 }}
+  name: {{ include "kubegpt.fullname" . }}
+  namespace: kubegpt
+spec:
+  ai:
+    backend: "openai"
+    model: "gpt-4-1106-preview"
+    secret:
+      name: "kubegpt-secret"
+      key: "openai-api-key"
+  sink:
+    type: "slack"
+    endpoint: {{ .Values.slack.webhook }}  # input your slack webhook url
