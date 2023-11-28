@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/kuberixenterprise/kubegpt/api/v1alpha1"
-	log "github.com/sirupsen/logrus"
 	"net/http"
+
+	"github.com/kuberixenterprise/kubegpt/api/v1alpha1"
+	"github.com/kuberixenterprise/kubegpt/pkg/ai"
+	log "github.com/sirupsen/logrus"
 )
 
 type SlackSink struct {
@@ -29,7 +31,7 @@ type Attachment struct {
 func formatEvent(event v1alpha1.Event) string {
 	// Format the event into a string.
 	// Modify this according to how you want to display each event.
-	return fmt.Sprintf("Event: %s - Count: %v - Reason: %s - Message: %s", event.Type, event.Count, event.Reason, event.Message)
+	return fmt.Sprintf("- Event: %s\n- Count: %v\n- Reason: %s\n- Message: %s", event.Type, event.Count, event.Reason, event.Message)
 }
 func (s *SlackSink) Configure(config *v1alpha1.Kubegpt) {
 	s.Endpoint = config.Spec.Sink.Endpoint
@@ -54,6 +56,24 @@ func buildSlackMessage(result v1alpha1.ResultSpec, k8sgptCR string) SlackMessage
 				Text:  detailsText,
 				Color: "danger",
 				Title: "Detailed Report",
+			},
+		},
+	}
+}
+
+func stringSlackMessage(text string, result v1alpha1.ResultSpec) SlackMessage {
+	var title string
+	for _, event := range result.Event {
+		title += fmt.Sprintf("Event: %s / Count: %v / Reason: %s / Message: %s", event.Type, event.Count, event.Reason, event.Message)
+	}
+	return SlackMessage{
+		Text: "[Error Message]" + title,
+		Attachments: []Attachment{
+			{
+				Type:  "mrkdwn",
+				Color: "good",
+				Title: "ChatGPT 결과",
+				Text:  text,
 			},
 		},
 	}
@@ -86,14 +106,30 @@ func (c *Client) SendHTTPRequest(method, url string, body []byte) (*http.Respons
 	return resp, nil
 }
 
-func (s *SlackSink) Emit(results v1alpha1.ResultSpec) error {
+func (s *SlackSink) Emit(results v1alpha1.ResultSpec, token string) error {
 	message := buildSlackMessage(results, "Kubegpt")
 	jsonData, err := json.Marshal(message)
+	slackClient(s, jsonData, results.Name)
+
+	go func() {
+		answer := ai.GetAnswer(message.Attachments[0].Text, token)
+		answerData, err := json.Marshal(stringSlackMessage(answer, results))
+		if err != nil {
+			log.WithError(err).WithField("component", "SlackSink").Error("Failed to marshal message")
+			return
+		}
+		slackClient(s, answerData, "chatGPT Answer")
+	}()
+
 	if err != nil {
 		log.WithError(err).WithField("component", "SlackSink").Error("Failed to marshal message")
 		return err
 	}
-	req, err := http.NewRequest(http.MethodPost, s.Endpoint, bytes.NewBuffer(jsonData))
+	return nil
+}
+
+func slackClient(s *SlackSink, sendData []byte, sendName string) error {
+	req, err := http.NewRequest(http.MethodPost, s.Endpoint, bytes.NewBuffer(sendData))
 	if err != nil {
 		log.WithError(err).WithField("component", "SlackSink").Error("Failed to create HTTP request")
 		return err
@@ -112,6 +148,6 @@ func (s *SlackSink) Emit(results v1alpha1.ResultSpec) error {
 		log.WithField("status", resp.Status).Error("Failed to send report")
 		return fmt.Errorf("failed to send report: %s", resp.Status)
 	}
-	log.Printf("Successfully sent report to Slack for %s", results.Name)
+	log.Printf("Successfully sent report to Slack for %s", sendName)
 	return nil
 }
