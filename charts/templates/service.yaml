@@ -4,6 +4,12 @@ metadata:
   name: {{ include "kubegpt.fullname" . }}
   labels:
     {{- include "kubegpt.labels" . | nindent 4 }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-0be3fe9a037e7f579,
+      subnet-02a6acd016d24f450
+    service.beta.kubernetes.io/aws-load-balancer-type: external
 spec:
   type: {{ .Values.service.type }}
   ports:
