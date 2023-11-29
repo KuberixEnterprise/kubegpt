@@ -63,7 +63,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 	for _, key := range secretList.Items {
-		if key.ObjectMeta.Namespace == "kubegpt" && key.ObjectMeta.Name == "kubegpt-secret" {
+		if key.ObjectMeta.Namespace == "charts" && key.ObjectMeta.Name == "charts-secret" {
 			getKey := key.Data["secretKey"]
 			token = string(getKey)
 		}

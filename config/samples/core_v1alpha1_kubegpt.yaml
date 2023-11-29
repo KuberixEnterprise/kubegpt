@@ -8,13 +8,13 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: kubebilder-test
   name: kubegpt-sample
-  namespace: kubegpt
+  namespace: charts
 spec:
   ai:
     backend: "openai"
     model: "gpt-4-1106-preview"
     secret:
-      name: "kubegpt-secret"
+      name: "charts-secret"
       key: "openai-api-key"
   sink:
     type: "slack"

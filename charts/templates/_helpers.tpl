@@ -35,10 +35,9 @@ Common labels
 */}}
 {{- define "kubegpt.labels" -}}
 helm.sh/chart: {{ include "kubegpt.chart" . }}
-{{ include "kubegpt.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
+app.kubernetes.io/name: {{ include "kubegpt.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
 {{- end }}
 
 {{/*

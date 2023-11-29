@@ -1,0 +1,49 @@
+{{- if and .Values.rbac.create (not .Values.rbac) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "kubegpt.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+      {{- include "kubegpt.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - services
+      - endpoints
+      - secrets
+      - configmaps
+      - events
+    verbs:
+      - get
+      - list
+      - watch
+
+  - apiGroups:
+      - results.core.test.kubebuilder.io
+    resources:
+      - results
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+
+  - apiGroups:
+      - kubegpt.core.test.kubebuilder.io
+    resources:
+      - kubegpt
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+{{- end }}

@@ -4,14 +4,14 @@ metadata:
   labels:
   {{- include "kubegpt.labels" . | nindent 4 }}
   name: {{ include "kubegpt.fullname" . }}
-  namespace: kubegpt
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   ai:
     backend: "openai"
-    model: "gpt-4-1106-preview"
+    model: {{ .Values.aiModel | default "gpt-3.5-turbo" }}
     secret:
       name: "kubegpt-secret"
-      key: "openai-api-key"
+      key: {{ .Values.aiToken | b64enc | quote }}
   sink:
     type: "slack"
-    endpoint: {{ .Values.slack.webhook }}  # input your slack webhook url
+    endpoint: {{ .Values.slack.webhook | quote }}  # input your slack webhook url

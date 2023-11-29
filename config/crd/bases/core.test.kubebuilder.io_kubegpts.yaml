@@ -11,7 +11,7 @@ spec:
     kind: Kubegpt
     listKind: KubegptList
     plural: kubegpts
-    singular: kubegpt
+    singular: charts
   scope: Namespaced
   versions:
   - name: v1alpha1

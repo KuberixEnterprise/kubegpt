@@ -8,14 +8,14 @@ import (
 )
 
 const (
-	DeploymentName = "kubegpt-deployment"
+	DeploymentName = "charts-deployment"
 )
 
 func GetService(config v1alpha1.Kubegpt) (*corev1.Service, error) {
 	// Create service
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kubegpt",
+			Name:      "charts",
 			Namespace: config.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -45,7 +45,7 @@ func GetServiceAccount(config v1alpha1.Kubegpt) (*corev1.ServiceAccount, error) 
 	// Create service account
 	serviceAccount := corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kubegpt",
+			Name:      "charts",
 			Namespace: config.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -66,7 +66,7 @@ func GetClusterRoleBinding(config v1alpha1.Kubegpt) (*r1.ClusterRoleBinding, err
 	// Create cluster role binding
 	clusterRoleBinding := r1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "kubegpt",
+			Name: "charts",
 			OwnerReferences: []metav1.OwnerReference{
 				{
 					Kind: config.Kind,
@@ -78,13 +78,13 @@ func GetClusterRoleBinding(config v1alpha1.Kubegpt) (*r1.ClusterRoleBinding, err
 		Subjects: []r1.Subject{
 			{
 				Kind:      "ServiceAccount",
-				Name:      "kubegpt",
+				Name:      "charts",
 				Namespace: config.Namespace,
 			},
 		},
 		RoleRef: r1.RoleRef{
 			Kind:     "ClusterRole",
-			Name:     "kubegpt",
+			Name:     "charts",
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
@@ -122,12 +122,12 @@ func GetClusterRoleBinding(config v1alpha1.Kubegpt) (*r1.ClusterRoleBinding, err
 //				},
 //			},
 //			Spec: corev1.PodSpec{
-//				ServiceAccountName: "kubegpt",
+//				ServiceAccountName: "charts",
 //				Containers: []corev1.Container{
 //					{
-//						Name:            "kubegpt",
+//						Name:            "charts",
 //						ImagePullPolicy: corev1.PullAlways,
-//						Image:           "ghcr.io/kubegpt-ai/kubegpt:" + config.Spec.Version,
+//						Image:           "ghcr.io/charts-ai/charts:" + config.Spec.Version,
 //						Args: []string{
 //							"serve",
 //						},
