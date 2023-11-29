@@ -43,8 +43,10 @@ securityContext: {}
 
 
 service:
-  type: LoadBalancer
+#  type: LoadBalancer
+  type: ClusterIP
   port: 80
+
 #
 #ingress:
 #  enabled: false
