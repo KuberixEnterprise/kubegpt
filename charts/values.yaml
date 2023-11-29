@@ -1,23 +1,27 @@
 # Default values for kubegpt.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+aiToken: "sk-" # base64 encoded OpenAI token
+aiModel: "gpt-4-1106-preview" # OpenAI model to use (one of: [ default : gpt-3-5-turbo ])
+slack:
+  webhook: ""
 
-#replicaCount: 1
+replicaCount: 1
 
-#image:
-#  repository: nginx
-#  pullPolicy: IfNotPresent
-#  # Overrides the image tag whose default is the chart appVersion.
-#  tag: ""
+image:
+  repository: ghcr.io/kuberixenterprise/kubegpt
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 100
 
 #imagePullSecrets: []
 #nameOverride: ""
 #fullnameOverride: ""
-secret:
-  secretKey: "" # base64 encoded OpenAI token
-
-slack:
-  webhook: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -76,12 +80,7 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-#autoscaling:
-#  enabled: false
-#  minReplicas: 1
-#  maxReplicas: 100
-#  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+
 
 # Additional volumes on the output Deployment definition.
 volumes: []

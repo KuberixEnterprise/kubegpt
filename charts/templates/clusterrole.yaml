@@ -7,14 +7,10 @@ metadata:
     {{- include "kubegpt.labels" . | nindent 4 }}
 rules:
   - apiGroups:
-      - *
+    - '*'
     resources:
-      - *
+    - '*'
     verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
+    - get
+    - list
+    - watch
