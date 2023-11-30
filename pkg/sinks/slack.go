@@ -119,14 +119,14 @@ func (s *SlackSink) Emit(results v1alpha1.ResultSpec, token string) error {
 			return
 		}
 		slackClient(s, answerData, "chatGPT Answer")
-		log.Printf("%s", answer)
+		log.Info(answer)
 	}()
 
 	if err != nil {
 		log.WithError(err).WithField("component", "SlackSink").Error("Failed to marshal message")
 		return err
 	}
-	log.Printf(message.Attachments[0].Text)
+	log.Info(message.Attachments[0].Text)
 	return nil
 }
 
