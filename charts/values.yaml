@@ -6,10 +6,10 @@ rbac :
 replicaCount: 1
 
 image:
-  pullPolicy: IfNotPresent
-#  repository: "ghcr.io/kuberixenterprise/charts"
+  pullPolicy: Always
+  repository: "ghcr.io/kuberixenterprise/kubegpt"
 #  # Overrides the image tag whose default is the chart appVersion.
-#  tag: "latest"
+  tag: "latest"
 
 aiToken: "" # base64 encoded OpenAI token
 aiModel: "gpt-4-1106-preview" # OpenAI model to use (one of: [ default : gpt-3-5-turbo ])"

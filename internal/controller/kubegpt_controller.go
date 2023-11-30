@@ -143,7 +143,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	// 결과 상태 업데이트
 	// reconcile duration 30s
-	return ctrl.Result{RequeueAfter: 30 * time.Second}, nil
+	return ctrl.Result{RequeueAfter: 300 * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
