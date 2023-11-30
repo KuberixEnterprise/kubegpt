@@ -49,7 +49,7 @@ func buildSlackMessage(result v1alpha1.ResultSpec, k8sgptCR string) SlackMessage
 	imagesText := fmt.Sprintf("%v", result.Images)
 
 	return SlackMessage{
-		Text: fmt.Sprintf(">*[%s] 파드에 에러가 발생했습니다 : %s %s label: %s image: %s*", k8sgptCR, result.Kind, result.Name, labelsText, imagesText),
+		Text: fmt.Sprintf(">*[%s] %s에 에러가 발생했습니다 : %s %s label: %s image: %s*", k8sgptCR, result.Kind, result.Kind, result.Name, labelsText, imagesText),
 		Attachments: []Attachment{
 			{
 				Type:  "mrkdwn",

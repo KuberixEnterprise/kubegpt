@@ -63,7 +63,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 	for _, key := range secretList.Items {
-		if key.ObjectMeta.Namespace == "charts" && key.ObjectMeta.Name == "charts-secret" {
+		if key.ObjectMeta.Namespace == "kubegpt" && key.ObjectMeta.Name == "kubegpt-secret" {
 			getKey := key.Data["secretKey"]
 			token = string(getKey)
 		}
@@ -82,27 +82,40 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	resultList := &corev1alpha1.ResultList{}
 
 	for _, event := range events.Items {
-		if event.Type == "Warning" && event.Regarding.Kind == "Pod" {
-			pod := &v1.Pod{}
-			if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod); err != nil {
-				l.Error(err, "Pod 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
-				continue
-			}
-
-			eventPod := corev1alpha1.Event{
+		if event.Type == "Warning" {
+			eventResource := corev1alpha1.Event{
 				Type:    event.Type,
 				Reason:  event.Reason,
 				Count:   int16(event.DeprecatedCount),
 				Message: event.Note,
 			}
-			// event의 리소스 이름과 네임스페이스 정보로 리소스 추적 (파드만)
-			// SerializeObjectAsJSON 함수 내에서 위에 선언한 Event struct와 pod 정보 result에 주입
-			jsonString, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod, eventPod)
-			if err != nil {
-				// 에러 처리
-				continue
+			if event.Regarding.Kind == "Pod" {
+				pod := &v1.Pod{}
+				if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod); err != nil {
+					l.Error(err, "Service 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
+					continue
+				}
+
+				jsonString, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod, eventResource)
+				if err != nil {
+					// 에러 처리
+					continue
+				}
+				resultList.Items = append(resultList.Items, jsonString)
+			} else if event.Regarding.Kind == "Service" {
+				service := &v1.Service{}
+				if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service); err != nil {
+					l.Error(err, "Service 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
+					continue
+				}
+
+				jsonString, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service, eventResource)
+				if err != nil {
+					// 에러 처리
+					continue
+				}
+				resultList.Items = append(resultList.Items, jsonString)
 			}
-			resultList.Items = append(resultList.Items, jsonString)
 		}
 	}
 
