@@ -24,7 +24,7 @@ jobs:
       - name: Run Makefile docker-buildx
         run: make docker-buildx
         env:
-          IMG: ghcr.io/kuberixenterprise/charts:latest
+          IMG: ghcr.io/kuberixenterprise/kubegpt:latest
           PLATFORMS: linux/amd64,linux/arm64
           CONTAINER_TOOL: docker
 

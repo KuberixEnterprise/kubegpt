@@ -18,4 +18,4 @@ spec:
       key: "openai-api-key"
   sink:
     type: "slack"
-    endpoint: ""  # input your slack webhook url
+    endpoint: "https://hooks.slack.com/services/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"  # input your slack webhook url
