@@ -15,7 +15,7 @@ spec:
     model: "gpt-4-1106-preview"
     secret:
       name: "kubegpt-secret"
-      key: "openai-api-key"
+      key: "openai-api-key" # input your base64-encoded openai key 
   sink:
     type: "slack"
     endpoint: ""  # input your slack webhook url

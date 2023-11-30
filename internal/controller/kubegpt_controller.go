@@ -56,18 +56,6 @@ type KubegptReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
 func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
-	// Open AI Token 값 얻기
-	secretList := &v1.SecretList{}
-	var token string
-	if err := r.Client.List(ctx, secretList); err != nil {
-		return ctrl.Result{}, client.IgnoreNotFound(err)
-	}
-	for _, key := range secretList.Items {
-		if key.ObjectMeta.Namespace == "kubegpt" && key.ObjectMeta.Name == "kubegpt-secret" {
-			getKey := key.Data["secretKey"]
-			token = string(getKey)
-		}
-	}
 	// result list 선언 + 에러 확인
 	kubegptConfig := &corev1alpha1.Kubegpt{}
 	if err := r.Client.Get(ctx, req.NamespacedName, kubegptConfig); err != nil {
@@ -130,7 +118,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				l.Error(err, "Result 조회 실패", "name", result.Name, "namespace", result.Namespace)
 			}
 			if res.Status.Webhook == "" {
-				if err := slackSink.Emit(result.Spec, token); err != nil {
+				if err := slackSink.Emit(result.Spec, kubegptConfig.Spec); err != nil {
 					l.Error(err, "Sink 발송 실패")
 					return ctrl.Result{}, err
 				}

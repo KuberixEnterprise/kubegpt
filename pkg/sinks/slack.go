@@ -106,13 +106,13 @@ func (c *Client) SendHTTPRequest(method, url string, body []byte) (*http.Respons
 	return resp, nil
 }
 
-func (s *SlackSink) Emit(results v1alpha1.ResultSpec, token string) error {
+func (s *SlackSink) Emit(results v1alpha1.ResultSpec, kubegpt v1alpha1.KubegptSpec) error {
 	message := buildSlackMessage(results, "Kubegpt")
 	jsonData, err := json.Marshal(message)
 	slackClient(s, jsonData, results.Name)
 
 	go func() {
-		answer := ai.GetAnswer(message.Attachments[0].Text, token)
+		answer := ai.GetAnswer(message.Attachments[0].Text, kubegpt)
 		answerData, err := json.Marshal(stringSlackMessage(answer, results))
 		if err != nil {
 			log.WithError(err).WithField("component", "SlackSink").Error("Failed to marshal message")
