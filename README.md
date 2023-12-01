@@ -79,20 +79,11 @@ export OPENAI_API_KEY=<API Key>
 **Helm Chart 설치**
 
 ```sh
-helm install kubegpt helm/kubegpt
+helm install kubegpt helm/kubegpt -n kubegpt \
+--set slack.webhook=${SLACK_WEBHOOK_URL} --set ai.token=${OPENAI_API_KEY} \
+--create-namespace
 ```
 
-**Delete the APIs(CRDs) from the cluster:**
-
-```sh
-make uninstall
-```
-
-**UnDeploy the controller from the cluster:**
-
-```sh
-make undeploy
-```
 
 ## Contributing
 // TODO(user): Add detailed information on how you would like others to contribute to this project
