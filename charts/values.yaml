@@ -1,20 +1,18 @@
 # Default values for charts.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-rbac :
-  create: true
-replicaCount: 1
+ai:
+  enabled: true # default: true
+  token: "" # base64 encoded OpenAI token
+  model: "gpt-4-1106-preview" # OpenAI model to use (one of: [ default : gpt-3-5-turbo ])"
 
-image:
-  pullPolicy: Always
-  repository: "ghcr.io/kuberixenterprise/kubegpt"
-#  # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+timer:
+    errorInterval: "30" # default: 60 seconds
+    aiInterval: "300" # default: 60 seconds
 
-aiToken: "" # base64 encoded OpenAI token
-aiModel: "gpt-4-1106-preview" # OpenAI model to use (one of: [ default : gpt-3-5-turbo ])"
+
 slack:
-  webhook: ""
+  webhook: "" # you must input your slack webhook url
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -26,6 +24,18 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+
+
+rbac :
+  create: true
+
+replicaCount: 1
+
+image:
+  pullPolicy: Always
+  repository: "ghcr.io/kuberixenterprise/kubegpt"
+  #  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
 
 podAnnotations: {}
 podLabels: {}
