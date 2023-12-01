@@ -18,8 +18,8 @@ spec:
       name: "kubegpt-secret"
       key: "openai-api-key" # input your base64-encoded openai key
   timer:
-    errorInterval: "30"
-    aiInterval: "300"
+    errorInterval: 30
+    interval: 300
   sink:
     type: "slack"
     endpoint: ""  # input your slack webhook url

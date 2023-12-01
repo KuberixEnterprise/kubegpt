@@ -38,6 +38,8 @@ spec:
                 properties:
                   backend:
                     type: string
+                  enabled:
+                    type: boolean
                   model:
                     default: gpt-gpt-4-1106-preview
                     type: string
@@ -53,6 +55,7 @@ spec:
                     type: object
                 required:
                 - backend
+                - enabled
                 - model
                 - secret
                 type: object
@@ -65,9 +68,17 @@ spec:
                     - slack
                     type: string
                 type: object
+              timer:
+                properties:
+                  errorInterval:
+                    type: integer
+                  interval:
+                    type: integer
+                type: object
             required:
             - ai
             - sink
+            - timer
             type: object
           status:
             description: KubegptStatus defines the observed state of Kubegpt

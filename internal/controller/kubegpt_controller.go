@@ -18,8 +18,11 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
+	"github.com/kuberixenterprise/kubegpt/pkg/ai"
 	"github.com/kuberixenterprise/kubegpt/pkg/integrations"
 	"github.com/kuberixenterprise/kubegpt/pkg/resource"
 	"github.com/kuberixenterprise/kubegpt/pkg/sinks"
@@ -125,6 +128,35 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				result.Status.Webhook = kubegptConfig.Spec.Sink.Endpoint
 			} else {
 				res.Status.Webhook = ""
+			}
+		}
+
+		if kubegptConfig.Spec.AI.Enabled {
+			for i, result := range resultList.Items {
+				var res corev1alpha1.Result
+				if err := r.Get(ctx, client.ObjectKey{Name: result.Name, Namespace: result.Namespace}, &res); err == nil {
+					l.Error(err, "Result 조회 실패", "name", result.Name, "namespace", result.Namespace)
+				}
+				if res.Status.Webhook == "" {
+					go func() {
+						content := fmt.Sprintf("Event: %s\n Count: %v\n Reason: %s\n Message: %s", result.Spec.Event[i].Type, result.Spec.Event[i].Count, result.Spec.Event[i].Reason, result.Spec.Event[i].Message)
+						answer := ai.GetAnswer(content, kubegptConfig.Spec)
+						answerData, err := json.Marshal(sinks.StringSlackMessage(answer, result.Spec))
+						if err != nil {
+							l.Error(err, "Failed to marshal message")
+							return
+						}
+						sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
+					}()
+					result.Status.Webhook = kubegptConfig.Spec.Sink.Endpoint
+				} else {
+					res.Status.Webhook = ""
+				}
+				// storeData := &corev1alpha1.ResultStatus{}
+				// storeData.Store[i].Kind = result.Kind
+				// storeData.Store[i].Name = result.Name
+				// storeData.Store[i].Namespace = result.Namespace
+				// storeData.Store[i].Message = result.
 			}
 		}
 	}

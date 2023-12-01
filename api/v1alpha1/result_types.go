@@ -25,6 +25,13 @@ import (
 
 // ResultSpec defines the desired state of Result
 
+type Store struct {
+	Kind      string `json:"kind"`
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	Message   string `json:"message"`
+}
+
 type Event struct {
 	Type    string `json:"Type"`
 	Reason  string `json:"Reason"`
@@ -43,8 +50,9 @@ type ResultSpec struct {
 
 // ResultStatus defines the observed state of Result
 type ResultStatus struct {
-	Webhook   string `json:"webhook,omitempty"`
-	LifeCycle string `json:"lifecycle,omitempty"`
+	Webhook   string  `json:"webhook,omitempty"`
+	LifeCycle string  `json:"lifecycle,omitempty"`
+	Store     []Store `json:"storedata,omitempty"`
 }
 
 //+kubebuilder:object:root=true
