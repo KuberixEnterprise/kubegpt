@@ -131,7 +131,8 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	// 결과 상태 업데이트
 	// reconcile duration 30s
-	return ctrl.Result{RequeueAfter: 300 * time.Second}, nil
+	l.Info("Timer 설정", "ErrorInterval", time.Duration(kubegptConfig.Spec.TimerRef.ErrorInterval)*time.Second)
+	return ctrl.Result{RequeueAfter: time.Duration(kubegptConfig.Spec.TimerRef.ErrorInterval) * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

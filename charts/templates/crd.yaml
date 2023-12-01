@@ -8,10 +8,13 @@ metadata:
 spec:
   ai:
     backend: "openai"
-    model: {{ .Values.aiModel | default "gpt-3.5-turbo" }}
+    model: {{ .Values.ai.model | default "gpt-3.5-turbo" }}
     secret:
       name: "kubegpt-secret"
-      key: {{ .Values.aiToken | b64enc | quote }}
+      key: {{ .Values.ai.token | b64enc | quote }}
+  timer:
+    errorInterval: {{ .Values.timer.errorInterval | default 60 }}
+    aiInterval: {{ .Values.timer.aiInterval | default 60 }}
   sink:
     type: "slack"
     endpoint: {{ .Values.slack.webhook | quote }}  # input your slack webhook url

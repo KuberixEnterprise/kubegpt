@@ -24,6 +24,8 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 type AISpec struct {
+	// +kubebuilder: default:=true
+	Enabled bool `json:"enabled"`
 	// +kubebuilder: default:=openai
 	Backend string `json:"backend"`
 	// +kubebuilder:default:=gpt-gpt-4-1106-preview
@@ -40,14 +42,21 @@ type WebhookRef struct {
 	Type     string `json:"type,omitempty"`
 	Endpoint string `json:"endpoint,omitempty"`
 }
+type TimerRef struct {
+	// +kubebuilder: default:=60s
+	ErrorInterval int `json:"errorInterval,omitempty"`
+	// +kubebuilder: default:=60s
+	Interval int `json:"interval,omitempty"`
+}
 
 type KubegptSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
 	//Version string  `json:"version"`
-	AI   *AISpec     `json:"ai"`
-	Sink *WebhookRef `json:"sink"`
+	AI       *AISpec     `json:"ai"`
+	TimerRef *TimerRef   `json:"timer"`
+	Sink     *WebhookRef `json:"sink"`
 }
 
 // KubegptStatus defines the observed state of Kubegpt
