@@ -46,7 +46,7 @@ type TimerRef struct {
 	// +kubebuilder: default:=60s
 	ErrorInterval int `json:"errorInterval,omitempty"`
 	// +kubebuilder: default:=60s
-	Interval int `json:"interval,omitempty"`
+	AiInterval int `json:"aiInterval,omitempty"`
 }
 
 type KubegptSpec struct {

@@ -7,6 +7,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
 spec:
   ai:
+    enabled: {{ .Values.ai.enabled | default true }}
     backend: "openai"
     model: {{ .Values.ai.model | default "gpt-3.5-turbo" }}
     secret:
