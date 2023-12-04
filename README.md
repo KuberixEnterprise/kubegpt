@@ -1,8 +1,5 @@
-# kubebilder-test
-// TODO(user): Add simple overview of use/purpose
-
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+# KubeGPT
+// Kubernetes의 Event를 기반으로 Slack에 Alert를 보내고 오류에 대한 GPT 답변을 받는 Operator
 
 ## Getting Started
 
@@ -12,59 +9,85 @@
 - kubectl version v1.11.3+.
 - Access to a Kubernetes v1.11.3+ cluster.
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+### Slack app setting
+**Slack을 통한 메세지를 받기 위해서는 Slack app 구성이 필요합니다.**
 
+1. https://api.slack.com/apps 에서 create new app을 선택합니다.
+
+2. From an app manifest를 선택합니다.
+
+3. 등록을 원하는 woekspace를 선택합니다.
+
+4. 아래의 JSON을 복사하여 Slack app의 manifest에 붙여넣습니다. ${}에는 원하는 값을 넣어주시면 됩니다.
+```
+{
+    "display_information": {
+        "name": "${APP_NAME}",
+        "description": "${APP_DESCRIPTION}",
+        "background_color": "${APP_BACKGROUND_COLOR}",
+    },
+    "features": {
+        "bot_user": {
+            "display_name": "${BOT_DISPLAY_NAME}",
+            "always_online": false
+        }
+    },
+    "oauth_config": {
+        "scopes": {
+            "bot": [
+                "chat:write",
+                "incoming-webhook"
+            ]
+        }
+    },
+    "settings": {
+        "org_deploy_enabled": false,
+        "socket_mode_enabled": false,
+        "token_rotation_enabled": false
+    }
+}
+```
+5. Install to Workspace로 APP을 추가하고 싶은 Slack 채널을 선택합니다.
+
+![img.png](img.png)
+
+6. Incoming Webhooks에서 Webhook URL을 복사합니다.
+
+![img_3.png](img_3.png)
 ```sh
-make docker-build docker-push IMG=<some-registry>/kubebilder-test:tag
+export SLACK_WEBHOOK_URL=<Webhook URL>
 ```
 
-**NOTE:** This image ought to be published in the personal registry you specified. 
-And it is required to have access to pull the image from the working environment. 
-Make sure you have the proper permission to the registry if the above commands don’t work.
+> **NOTE**: Slack URL은 외부에 공유되면 안됩니다.
 
-**Install the CRDs into the cluster:**
+<br>
 
+---
+<br>
+
+### GPT setting
+**GPT API를 사용하기 위해 API Key를 발급합니다.**
+https://platform.openai.com/api-keys 에서 API Key를 발급받습니다.
+Key를 복사해서 아래의 명령어를 실행합니다.
 ```sh
-make install
+export OPENAI_API_KEY=<API Key>
 ```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
+>**NOTE**: API Key는 외부에 공유되면 안됩니다.
+
+### Helm Install
+**Helm Chart 설치**
 
 ```sh
-make deploy IMG=<some-registry>/kubebilder-test:tag
+helm repo add kubegpt https://kuberixenterprise.github.io/kubegpt/
+
+helm repo update
+
+helm install kubegpt  kubegpt/kubegpt -n kubegpt \
+--set slack.webhook=${SLACK_WEBHOOK_URL} --set ai.token=${OPENAI_API_KEY} \
+--create-namespace
 ```
 
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin 
-privileges or be logged in as admin.
-
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
-
-```sh
-kubectl apply -k config/samples/
-```
-
->**NOTE**: Ensure that the samples has default values to test it out.
-
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
-
-```sh
-kubectl delete -k config/samples/
-```
-
-**Delete the APIs(CRDs) from the cluster:**
-
-```sh
-make uninstall
-```
-
-**UnDeploy the controller from the cluster:**
-
-```sh
-make undeploy
-```
 
 ## Contributing
 // TODO(user): Add detailed information on how you would like others to contribute to this project

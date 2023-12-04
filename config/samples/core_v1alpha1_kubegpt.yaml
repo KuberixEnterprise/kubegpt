@@ -1,4 +1,4 @@
-apiVersion: core.test.kubebuilder.io/v1alpha1
+apiVersion: core.kubegpt.io/v1alpha1
 kind: Kubegpt
 metadata:
   labels:
@@ -11,11 +11,15 @@ metadata:
   namespace: kubegpt
 spec:
   ai:
+    enabled: true
     backend: "openai"
     model: "gpt-4-1106-preview"
     secret:
       name: "kubegpt-secret"
-      key: "openai-api-key" # input your base64-encoded openai key 
+      key: "openai-api-key" # input your base64-encoded openai key
+  timer:
+    errorInterval: 30
+    interval: 300
   sink:
     type: "slack"
     endpoint: ""  # input your slack webhook url
