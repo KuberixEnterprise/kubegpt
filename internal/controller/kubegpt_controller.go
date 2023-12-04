@@ -37,6 +37,13 @@ import (
 	corev1alpha1 "github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 )
 
+type Store struct {
+	Kind      string   `json:"kind"`
+	Name      string   `json:"name"`
+	Namespace string   `json:"namespace"`
+	Message   []string `json:"message"`
+}
+
 // KubegptReconciler reconciles a Kubegpt object
 type KubegptReconciler struct {
 	client.Client
@@ -109,7 +116,13 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			}
 		}
 	}
-
+	//////test//////
+	storeData := &Store{}
+	for i, data := range resultList.Items {
+		storeData.Message[i] = data.Spec.Event[0].Message
+		fmt.Println(storeData.Message)
+	}
+	////////////////
 	if kubegptConfig.Spec.Sink != nil && kubegptConfig.Spec.Sink.Type != "" && kubegptConfig.Spec.Sink.Endpoint != "" {
 		// sink 설정
 		var slackSink sinks.SlackSink
@@ -132,14 +145,14 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 
 		if kubegptConfig.Spec.AI.Enabled {
-			for i, result := range resultList.Items {
+			for _, result := range resultList.Items {
 				var res corev1alpha1.Result
 				if err := r.Get(ctx, client.ObjectKey{Name: result.Name, Namespace: result.Namespace}, &res); err == nil {
 					l.Error(err, "Result 조회 실패", "name", result.Name, "namespace", result.Namespace)
 				}
 				if res.Status.Webhook == "" {
 					go func() {
-						content := fmt.Sprintf("Event: %s\n Count: %v\n Reason: %s\n Message: %s", result.Spec.Event[i].Type, result.Spec.Event[i].Count, result.Spec.Event[i].Reason, result.Spec.Event[i].Message)
+						content := fmt.Sprintf("Event: %s\n Count: %v\n Reason: %s\n Message: %s", result.Spec.Event[0].Type, result.Spec.Event[0].Count, result.Spec.Event[0].Reason, result.Spec.Event[0].Message)
 						answer := ai.GetAnswer(content, kubegptConfig.Spec)
 						answerData, err := json.Marshal(sinks.StringSlackMessage(answer, result.Spec))
 						if err != nil {
@@ -147,16 +160,14 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 							return
 						}
 						sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
+
+						// fmt.Printf("$$$$storeData Message : %s", storeData.Message)
+						// fmt.Println(content)
 					}()
 					result.Status.Webhook = kubegptConfig.Spec.Sink.Endpoint
 				} else {
 					res.Status.Webhook = ""
 				}
-				// storeData := &corev1alpha1.ResultStatus{}
-				// storeData.Store[i].Kind = result.Kind
-				// storeData.Store[i].Name = result.Name
-				// storeData.Store[i].Namespace = result.Namespace
-				// storeData.Store[i].Message = result.
 			}
 		}
 	}

@@ -78,24 +78,6 @@ spec:
             properties:
               lifecycle:
                 type: string
-              storedata:
-                items:
-                  properties:
-                    kind:
-                      type: string
-                    message:
-                      type: string
-                    name:
-                      type: string
-                    namespace:
-                      type: string
-                  required:
-                  - kind
-                  - message
-                  - name
-                  - namespace
-                  type: object
-                type: array
               webhook:
                 type: string
             type: object
