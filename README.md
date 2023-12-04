@@ -49,11 +49,11 @@
 ```
 5. Install to Workspace로 APP을 추가하고 싶은 Slack 채널을 선택합니다.
 
-![img.png](img.png)
+![img.png](img/img.png)
 
 6. Incoming Webhooks에서 Webhook URL을 복사합니다.
 
-![img_3.png](img_3.png)
+![img_3.png](img/img_3.png)
 ```sh
 export SLACK_WEBHOOK_URL=<Webhook URL>
 ```
