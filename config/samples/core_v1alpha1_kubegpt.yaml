@@ -1,4 +1,4 @@
-apiVersion: core.test.kubebuilder.io/v1alpha1
+apiVersion: core.kubegpt.io/v1alpha1
 kind: Kubegpt
 metadata:
   labels:

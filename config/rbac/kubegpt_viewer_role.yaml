@@ -12,7 +12,7 @@ metadata:
   name: kubegpt-viewer-role
 rules:
 - apiGroups:
-  - core.test.kubebuilder.io
+  - core.kubegpt.io
   resources:
   - kubegpts
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.test.kubebuilder.io
+  - core.kubegpt.io
   resources:
   - kubegpts/status
   verbs:

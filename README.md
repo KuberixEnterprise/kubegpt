@@ -79,7 +79,11 @@ export OPENAI_API_KEY=<API Key>
 **Helm Chart 설치**
 
 ```sh
-helm install kubegpt helm/kubegpt -n kubegpt \
+helm repo add kubegpt https://kuberixenterprise.github.io/kubegpt/
+
+helm repo update
+
+helm install kubegpt  kubegpt/kubegpt -n kubegpt \
 --set slack.webhook=${SLACK_WEBHOOK_URL} --set ai.token=${OPENAI_API_KEY} \
 --create-namespace
 ```

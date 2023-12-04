@@ -7,4 +7,4 @@ type: application
 version: 0.1.0
 
 sources:
-  - https://github.com/kuberixenterprise/kubegpt
+  - https://kuberixenterprise.github.io/kubegpt/

@@ -41,9 +41,9 @@ type KubegptReconciler struct {
 	Integrations *integrations.Integrations
 }
 
-//+kubebuilder:rbac:groups=core.test.kubebuilder.io,resources=kubegpts,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core.test.kubebuilder.io,resources=kubegpts/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.test.kubebuilder.io,resources=kubegpts/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core.kubegpt.io,resources=kubegpts,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core.kubegpt.io,resources=kubegpts/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.kubegpt.io,resources=kubegpts/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

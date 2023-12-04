@@ -22,7 +22,7 @@ rules:
       - watch
 
   - apiGroups:
-      - results.core.test.kubebuilder.io
+      - results.core.kubegpt.io
     resources:
       - results
     verbs:
@@ -35,7 +35,7 @@ rules:
       - delete
 
   - apiGroups:
-      - kubegpt.core.test.kubebuilder.io
+      - kubegpt.core.kubegpt.io
     resources:
       - kubegpt
     verbs:

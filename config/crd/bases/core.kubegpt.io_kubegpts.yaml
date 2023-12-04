@@ -4,7 +4,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.13.0
-  name: core.kubegpt.io
+  name: kubegpts.core.kubegpt.io
 spec:
   group: core.kubegpt.io
   names:

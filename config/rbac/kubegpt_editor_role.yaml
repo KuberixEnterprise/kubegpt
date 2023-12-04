@@ -12,7 +12,7 @@ metadata:
   name: kubegpt-editor-role
 rules:
 - apiGroups:
-  - core.test.kubebuilder.io
+  - core.kubegpt.io
   resources:
   - kubegpts
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.test.kubebuilder.io
+  - core.kubegpt.io
   resources:
   - kubegpts/status
   verbs:
