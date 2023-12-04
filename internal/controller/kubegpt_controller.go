@@ -117,11 +117,11 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 	//////test//////
-	storeData := &Store{}
-	for i, data := range resultList.Items {
-		storeData.Message[i] = data.Spec.Event[0].Message
-		fmt.Println(storeData.Message)
-	}
+	// storeData := &Store{}
+	// for i, data := range resultList.Items {
+	// 	storeData.Message[i] = data.Spec.Event[0].Message
+	// 	fmt.Println(storeData.Message)
+	// }
 	////////////////
 	if kubegptConfig.Spec.Sink != nil && kubegptConfig.Spec.Sink.Type != "" && kubegptConfig.Spec.Sink.Endpoint != "" {
 		// sink 설정
