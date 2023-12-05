@@ -25,6 +25,13 @@ import (
 
 // ResultSpec defines the desired state of Result
 
+type Store struct {
+	Kind      string `json:"kind"`
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	Message   string `json:"message"`
+}
+
 type Event struct {
 	Type    string `json:"Type"`
 	Reason  string `json:"Reason"`
@@ -66,6 +73,7 @@ type ResultList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Result `json:"items"`
+	Store           []Store  `json:"store,omitempty"`
 }
 
 func init() {

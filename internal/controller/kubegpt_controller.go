@@ -37,13 +37,6 @@ import (
 	corev1alpha1 "github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 )
 
-type Store struct {
-	Kind      string   `json:"kind"`
-	Name      string   `json:"name"`
-	Namespace string   `json:"namespace"`
-	Message   []string `json:"message"`
-}
-
 // KubegptReconciler reconciles a Kubegpt object
 type KubegptReconciler struct {
 	client.Client
@@ -90,16 +83,17 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			if event.Regarding.Kind == "Pod" {
 				pod := &v1.Pod{}
 				if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod); err != nil {
-					l.Error(err, "Service 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
+					l.Error(err, "Pod 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
 					continue
 				}
 
-				jsonString, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod, eventResource)
+				jsonString, store, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod, eventResource)
 				if err != nil {
 					// 에러 처리
 					continue
 				}
 				resultList.Items = append(resultList.Items, jsonString)
+				resultList.Store = append(resultList.Store, store)
 			} else if event.Regarding.Kind == "Service" {
 				service := &v1.Service{}
 				if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service); err != nil {
@@ -107,22 +101,16 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 					continue
 				}
 
-				jsonString, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service, eventResource)
+				jsonString, store, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service, eventResource)
 				if err != nil {
 					// 에러 처리
 					continue
 				}
 				resultList.Items = append(resultList.Items, jsonString)
+				resultList.Store = append(resultList.Store, store)
 			}
 		}
 	}
-	//////test//////
-	// storeData := &Store{}
-	// for i, data := range resultList.Items {
-	// 	storeData.Message[i] = data.Spec.Event[0].Message
-	// 	fmt.Println(storeData.Message)
-	// }
-	////////////////
 	if kubegptConfig.Spec.Sink != nil && kubegptConfig.Spec.Sink.Type != "" && kubegptConfig.Spec.Sink.Endpoint != "" {
 		// sink 설정
 		var slackSink sinks.SlackSink
@@ -160,9 +148,6 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 							return
 						}
 						sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
-
-						// fmt.Printf("$$$$storeData Message : %s", storeData.Message)
-						// fmt.Println(content)
 					}()
 					result.Status.Webhook = kubegptConfig.Spec.Sink.Endpoint
 				} else {
