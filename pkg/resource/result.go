@@ -14,12 +14,13 @@ import (
 )
 
 // SerializeObjectAsJSON 함수는 주어진 Kubernetes 오브젝트를 JSON 형식으로 직렬화합니다.
-func SerializeObjectAsJSON(ctx context.Context, c client.Client, key client.ObjectKey, obj client.Object, eventResource v1alpha1.Event) (v1alpha1.Result, error) {
+func SerializeObjectAsJSON(ctx context.Context, c client.Client, key client.ObjectKey, obj client.Object, eventResource v1alpha1.Event) (v1alpha1.Result, v1alpha1.Store, error) {
 	var result v1alpha1.Result
+	var store v1alpha1.Store
 
 	// 오브젝트를 Kubernetes API 서버로부터 가져옵니다.
 	if err := c.Get(ctx, key, obj); err != nil {
-		return result, err
+		return result, store, err
 	}
 
 	// Pod 타입의 리소스 처리
@@ -35,12 +36,19 @@ func SerializeObjectAsJSON(ctx context.Context, c client.Client, key client.Obje
 				Event:     []v1alpha1.Event{eventResource},
 			},
 		}
+
+		store = v1alpha1.Store{
+			Kind:      pod.Kind,
+			Name:      pod.Name,
+			Namespace: pod.Namespace,
+			Message:   eventResource.Message,
+		}
 		//// 결과를 JSON으로 직렬화
 		//jsonBytes, err := json.Marshal(result)
 		//if err != nil {
 		//	return "", err
 		//}
-		return result, nil
+		return result, store, nil
 	}
 
 	// 다른 타입의 리소스에 대한 처리 (필요한 경우)
@@ -55,10 +63,16 @@ func SerializeObjectAsJSON(ctx context.Context, c client.Client, key client.Obje
 				Event:     []v1alpha1.Event{eventResource},
 			},
 		}
-		return result, nil
+		store = v1alpha1.Store{
+			Kind:      service.Kind,
+			Name:      service.Name,
+			Namespace: service.Namespace,
+			Message:   eventResource.Message,
+		}
+		return result, store, nil
 	}
 
-	return result, nil
+	return result, store, nil
 }
 
 func extractImagesFromPod(pod *v1.Pod) []string {
