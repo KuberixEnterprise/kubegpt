@@ -7,4 +7,4 @@ type: application
 version: 0.1.0
 
 sources:
-  - https://kuberixenterprise.github.io/kubegpt/
+  - https://kuberixenterprise.github.io/kubegpt/kubeGPT/
