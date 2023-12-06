@@ -11,21 +11,14 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: kubegpt-editor-role
 rules:
-- apiGroups:
-  - core.kubegpt.io
-  resources:
-  - kubegpts
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.kubegpt.io
-  resources:
-  - kubegpts/status
-  verbs:
-  - get
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - create
+      - delete
+      - patch
+      - get
+      - list
+      - watch

@@ -1,0 +1,1 @@
+{"ingress-nginx-controller___FailedBuildModel":{"Message":"Failed build model due to unable to resolve at least one subnet (0 match VPC and tags)","Timestamp":"2023-12-06T15:06:14.244245+09:00"}}
