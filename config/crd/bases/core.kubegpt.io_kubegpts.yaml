@@ -59,7 +59,18 @@ spec:
                 - model
                 - secret
                 type: object
+              cache:
+                properties:
+                  enabled:
+                    type: boolean
+                  path:
+                    type: string
+                required:
+                - enabled
+                - path
+                type: object
               sink:
+                description: Timer *TimerRef   `json:"timer"`
                 properties:
                   endpoint:
                     type: string
@@ -70,13 +81,19 @@ spec:
                 type: object
               timer:
                 properties:
+                  aiInterval:
+                    format: int64
+                    type: integer
                   errorInterval:
+                    format: int64
                     type: integer
-                  interval:
-                    type: integer
+                required:
+                - aiInterval
+                - errorInterval
                 type: object
             required:
             - ai
+            - cache
             - sink
             - timer
             type: object

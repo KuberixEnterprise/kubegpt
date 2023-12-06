@@ -43,10 +43,16 @@ type WebhookRef struct {
 	Endpoint string `json:"endpoint,omitempty"`
 }
 type TimerRef struct {
-	// +kubebuilder: default:=60s
-	ErrorInterval int `json:"errorInterval,omitempty"`
-	// +kubebuilder: default:=60s
-	AiInterval int `json:"aiInterval,omitempty"`
+	// +kubebuilder: default:=60
+	ErrorInterval int64 `json:"errorInterval"`
+	// +kubebuilder: default:=60
+	AiInterval int64 `json:"aiInterval"`
+}
+
+type CacheRef struct {
+	// +kubebuilder: default:=true
+	Enabled bool   `json:"enabled"`
+	Path    string `json:"path"`
 }
 
 type KubegptSpec struct {
@@ -54,9 +60,11 @@ type KubegptSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	//Version string  `json:"version"`
-	AI       *AISpec     `json:"ai"`
-	TimerRef *TimerRef   `json:"timer"`
-	Sink     *WebhookRef `json:"sink"`
+	AI *AISpec `json:"ai"`
+	//Timer *TimerRef   `json:"timer"`
+	Sink  *WebhookRef `json:"sink"`
+	Cache *CacheRef   `json:"cache"`
+	Timer *TimerRef   `json:"timer"`
 }
 
 // KubegptStatus defines the observed state of Kubegpt

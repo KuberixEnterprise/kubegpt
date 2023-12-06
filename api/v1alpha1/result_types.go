@@ -37,6 +37,7 @@ type Event struct {
 	Reason  string `json:"Reason"`
 	Count   int16  `json:"Count"`
 	Message string `json:"Message"`
+	//Timestamp time.Time 'json:"Timestamp",'
 }
 
 type ResultSpec struct {

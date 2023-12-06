@@ -19,3 +19,6 @@ spec:
   sink:
     type: "slack"
     endpoint: {{ .Values.slack.webhook | quote }}  # input your slack webhook url
+  cache:
+    enabled: {{ .Values.cache.enabled | default true }}
+    path: {{ .Values.cache.path | default "./cache" }}
