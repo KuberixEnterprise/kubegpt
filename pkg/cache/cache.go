@@ -16,6 +16,7 @@ type Cache struct {
 }
 type CacheItem struct {
 	Message   string
+	Answer    string
 	Timestamp time.Time
 }
 
@@ -33,9 +34,17 @@ func (c *Cache) CacheAdd(key, value string) {
 }
 
 // CacheUpdate 캐시 업데이트 (기존 값 대체)
-func (c *Cache) CacheUpdate(key, value string) {
+func (c *Cache) CacheTimeUpdate(key string) {
 	if item, exists := c.Data[key]; exists {
 		item.Timestamp = time.Now() // 타임스탬프 갱신
+		c.Data[key] = item
+	}
+}
+
+func (c *Cache) CacheGPTUpdate(key string, value []byte) {
+	if item, exists := c.Data[key]; exists {
+		answer := string(value)
+		item.Answer = answer
 		c.Data[key] = item
 	}
 }
