@@ -44,10 +44,6 @@ type KubegptReconciler struct {
 	Integrations *integrations.Integrations
 }
 
-const (
-	cacheFilePath = "./cache.json"
-)
-
 //+kubebuilder:rbac:groups=core.kubegpt.io,resources=kubegpts,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core.kubegpt.io,resources=kubegpts/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=core.kubegpt.io,resources=kubegpts/finalizers,verbs=update
@@ -69,6 +65,8 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err := r.Client.Get(ctx, req.NamespacedName, kubegptConfig); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+	cacheFilePath := kubegptConfig.Spec.Cache.Path
+
 	events := &v12.EventList{}
 	if err := r.Client.List(ctx, events); err != nil {
 		return ctrl.Result{}, err
