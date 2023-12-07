@@ -183,7 +183,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		//		}
 		//		if res.Status.Webhook == "" {
 		//			go func() {
-		//				content := fmt.Sprintf("Event: %s\n Count: %v\n Reason: %s\n Message: %s", result.Spec.Event[0].Type, result.Spec.Event[0].Count, result.Spec.Event[0].Reason, result.Spec.Event[0].Message)
+		//				content := tmp.Sprintf("Event: %s\n Count: %v\n Reason: %s\n Message: %s", result.Spec.Event[0].Type, result.Spec.Event[0].Count, result.Spec.Event[0].Reason, result.Spec.Event[0].Message)
 		//				answer := ai.GetAnswer(content, kubegptConfig.Spec)
 		//				answerData, err := json.Marshal(sinks.StringSlackMessage(answer, result.Spec))
 		//				if err != nil {

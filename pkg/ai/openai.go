@@ -41,7 +41,7 @@ func GetAnswer(content string, kubegpt v1alpha1.KubegptSpec) string {
 		return err.Error()
 	}
 
-	// fmt.Println(response.Choices[0].Message.Content)
+	// tmp.Println(response.Choices[0].Message.Content)
 	return response.Choices[0].Message.Content
 
 }
