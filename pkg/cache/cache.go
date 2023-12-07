@@ -76,7 +76,7 @@ func (c *Cache) SaveCacheToFile(filePath string) error {
 	return os.WriteFile(filePath, dataBytes, 0644)
 }
 
-func (c Cache) DuplicateEvent(key, value string) bool {
+func (c *Cache) DuplicateEvent(key, value string) bool {
 	if item, exists := c.Data[key]; exists {
 		return item.Message == value
 	}

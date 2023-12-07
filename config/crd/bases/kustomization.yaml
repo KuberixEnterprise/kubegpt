@@ -2,8 +2,8 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
-- ../../config/crd/bases/core.kubegpt.io_results.yaml
-- ../../config/crd/bases/core.kubegpt.io_kubegpts.yaml
+- core.kubegpt.io_results.yaml
+- core.kubegpt.io_kubegpts.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patches:
