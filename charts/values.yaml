@@ -27,7 +27,7 @@ serviceAccount:
 
 cache:
   enabled: true # default: true
-  path: "./cache" # default: "./cache"
+  path: "./tmp/cache" # default: "./cache"
 
 rbac :
   create: true
