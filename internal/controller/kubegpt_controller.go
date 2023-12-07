@@ -125,6 +125,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			l.Error(err, "캐시 데이터 로드 실패")
 			return ctrl.Result{}, err
 		}
+		l.Info("캐시 데이터 로드", "캐시 내역", cache.Data)
 		for _, result := range resultList.Items {
 			var res corev1alpha1.Result
 			result := result
@@ -203,7 +204,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	// 결과 상태 업데이트
 	// reconcile duration 30s
-	l.Info("Timer 설정", "ErrorInterval", time.Duration(kubegptConfig.Spec.Timer.ErrorInterval)*time.Second)
+	//l.Info("Timer 설정", "ErrorInterval", time.Duration(kubegptConfig.Spec.Timer.ErrorInterval)*time.Second)
 	return ctrl.Result{RequeueAfter: time.Duration(kubegptConfig.Spec.Timer.ErrorInterval) * time.Second}, nil
 }
 
