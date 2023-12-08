@@ -7,4 +7,14 @@ type: application
 version: 0.1.0
 
 sources:
+  - https://my-website.com/foo/bar
+
+
+
+
+
+
+
+
+
   - https://kuberixenterprise.github.io/kubegpt/kubeGPT/

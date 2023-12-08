@@ -82,28 +82,25 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				Count:   int16(event.DeprecatedCount),
 				Message: event.Note,
 			}
-			if event.Regarding.Kind == "Pod" {
+			var err error
+			var obj client.Object
+			switch event.Regarding.Kind {
+			case "Pod":
 				pod := &v1.Pod{}
-				if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod); err != nil {
-					l.Error(err, "Pod 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
-					continue
-				}
-
-				jsonString, store, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod, eventResource)
-				if err != nil {
-					// 에러 처리
-					continue
-				}
-				resultList.Items = append(resultList.Items, jsonString)
-				resultList.Store = append(resultList.Store, store)
-			} else if event.Regarding.Kind == "Service" {
+				err = r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, pod)
+				obj = pod
+			case "Service":
 				service := &v1.Service{}
-				if err := r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service); err != nil {
-					l.Error(err, "Service 조회 실패", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
-					continue
-				}
-
-				jsonString, store, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service, eventResource)
+				err = r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service)
+				obj = service
+			default:
+				continue
+			}
+			if err != nil {
+				l.Info("조회 실패 이벤트를 제외합니다.", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
+				continue
+			} else {
+				jsonString, store, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, obj, eventResource)
 				if err != nil {
 					// 에러 처리
 					continue
@@ -111,8 +108,10 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				resultList.Items = append(resultList.Items, jsonString)
 				resultList.Store = append(resultList.Store, store)
 			}
+
 		}
 	}
+
 	if kubegptConfig.Spec.Sink != nil && kubegptConfig.Spec.Sink.Type != "" && kubegptConfig.Spec.Sink.Endpoint != "" {
 		// sink 설정
 		var slackSink sinks.SlackSink
@@ -120,19 +119,22 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		cache := c.NewCache()
 		err := cache.LoadCacheFromFile(cacheFilePath)
 		if err != nil {
-			l.Error(err, "캐시 데이터 로드 실패")
+			l.Error(err, "캐시 읽기 실패")
 			return ctrl.Result{}, err
 		}
-		l.Info("캐시 데이터 로드", "캐시 내역", cache.Data)
+		l.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count", len(cache.Data))
+		var keystore []string
 		for _, result := range resultList.Items {
 			var res corev1alpha1.Result
 			result := result
 			key := result.Spec.Name + "_" + result.Namespace + "_" + result.Kind + "_" + result.Spec.Event[0].Reason
 			value := result.Spec.Event[0].Message
+			count := int(result.Spec.Event[0].Count)
+			keystore = append(keystore, key)
 			if !cache.DuplicateEvent(key, value) {
-				cache.CacheAdd(key, value)
+				cache.CacheAdd(key, value, count)
 				cache.SaveCacheToFile(cacheFilePath)
-				l.Info("캐시 데이터 저장", "key", key, "value", value)
+				l.Info("캐시 데이터 저장(New Event)", "Add Cache", key)
 
 				if err := r.Get(ctx, client.ObjectKey{Name: result.Name, Namespace: result.Namespace}, &res); err == nil {
 					l.Error(err, "Result 조회 실패", "name", result.Name, "namespace", result.Namespace)
@@ -164,17 +166,27 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 					res.Status.Webhook = ""
 				}
 			} else {
-				// 캐시에 시간 넣는 방법
-				if time.Since(cache.Data[key].Timestamp) > 20*time.Minute {
-					// 슬랙에 새로 보내는 로직
-					// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
-					cache.CacheTimeUpdate(key)
-					cache.SaveCacheToFile(cacheFilePath)
+				// 캐시에 이미 있는 경우
+				// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
+				if time.Since(cache.Data[key].Timestamp) > 2*time.Minute {
+					// 20분 경과 했지만 error Count 증가 없는 경우 에러 해결로 판단 pass
+					if time.Since(cache.Data[key].ErrorTime) > 1*time.Minute {
+						l.Info("추가 에러 없으므로 패스: %s\n", "key", key)
+					} else {
+						// 슬랙에 새로 보내는 로직
+						// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
+						cache.CacheTimeUpdate(key)
+						cache.SaveCacheToFile(cacheFilePath)
+
+						l.Info("캐시 Timestamp 업데이트", "key", key)
+					}
 				}
 			}
 		}
-		l.Info("캐시 :", "캐시 내역", cache.Data)
 
+		//l.Info("캐시 조회 (For문 이후) :", "Cache list", cache.Data)
+		cache.Cleanup(keystore)
+		//l.Info("캐시 삭제 후:", "Delete Cache ", cache.Data)
 		//if kubegptConfig.Spec.AI.Enabled {
 		//	for _, result := range resultList.Items {
 		//		var res corev1alpha1.Result
@@ -204,6 +216,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	// reconcile duration 30s
 	//l.Info("Timer 설정", "ErrorInterval", time.Duration(kubegptConfig.Spec.Timer.ErrorInterval)*time.Second)
 	return ctrl.Result{RequeueAfter: time.Duration(kubegptConfig.Spec.Timer.ErrorInterval) * time.Second}, nil
+	//return ctrl.Result{RequeueAfter: time.Duration(5) * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
