@@ -151,26 +151,45 @@ func (s *SlackSink) Emit(results v1alpha1.ResultSpec, kubegpt v1alpha1.KubegptSp
 	return gptMsg, nil
 }
 
-func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessageBlock {
-	// 캐시 아이템에서 err와 answer 추출
-	errorTextBlock := Block{
-		Type: "section",
-		Text: &TextObject{
-			Type: "mrkdwn",
-			Text: fmt.Sprintf("*해결 되지 않은 에러* %s\n*Error Message:* %s", key, cachedData.Message),
-		},
-	}
+//func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessageBlock {
+//	// 캐시 아이템에서 err와 answer 추출
+//	errorTextBlock := Block{
+//		Type: "section",
+//		Text: &TextObject{
+//			Type: "mrkdwn",
+//			Text: fmt.Sprintf("*해결 되지 않은 에러* %s\n*Error Message:* %s", key, cachedData.Message),
+//		},
+//	}
+//
+//	// AI 응답 표시를 위한 텍스트 섹션
+//	answerTextBlock := Block{
+//		Type: "section",
+//		Text: &TextObject{
+//			Type: "mrkdwn",
+//			Text: fmt.Sprintf("*이전 답변:* %v\n", cachedData.Answer),
+//		},
+//	}
+//	return SlackMessageBlock{
+//		Blocks: []Block{errorTextBlock, answerTextBlock},
+//	}
+//}
 
-	// AI 응답 표시를 위한 텍스트 섹션
-	answerTextBlock := Block{
-		Type: "section",
-		Text: &TextObject{
-			Type: "mrkdwn",
-			Text: fmt.Sprintf("*이전 답변:* %s\n", cachedData.Answer),
+func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessage {
+	return SlackMessage{
+		Attachments: []Attachment{
+			{
+				Type:  "mrkdwn",
+				Color: "danger",
+				Title: "해결 되지 않은 에러",
+				Text:  fmt.Sprintf("*%s*\n*Error Message:* %s", key, cachedData.Message),
+			},
+			{
+				Type:  "mrkdwn",
+				Color: "good",
+				Title: "이전 답변",
+				Text:  fmt.Sprintf("*%v*", cachedData.Answer),
+			},
 		},
-	}
-	return SlackMessageBlock{
-		Blocks: []Block{errorTextBlock, answerTextBlock},
 	}
 }
 
