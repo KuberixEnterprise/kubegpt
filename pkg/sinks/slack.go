@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/kuberixenterprise/kubegpt/pkg/cache"
 	"net/http"
 
 	"github.com/kuberixenterprise/kubegpt/api/v1alpha1"
@@ -18,6 +19,37 @@ type SlackSink struct {
 type SlackMessage struct {
 	Text        string       `json:"text"`
 	Attachments []Attachment `json:"attachments"`
+}
+
+type SlackMessageBlock struct {
+	Blocks []Block `json:"blocks"`
+}
+
+type Block struct {
+	Type     string      `json:"type"`
+	Text     *TextObject `json:"text,omitempty"`
+	Fields   []Field     `json:"fields,omitempty"`
+	Elements []Element   `json:"elements,omitempty"`
+	// 기타 필요한 블록 타입별 필드
+}
+
+type TextObject struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
+type Field struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
+type Element struct {
+	Type     string      `json:"type"`
+	Text     *TextObject `json:"text,omitempty"`
+	ActionID string      `json:"action_id,omitempty"`
+	URL      string      `json:"url,omitempty"`
+	Value    string      `json:"value,omitempty"`
+	// 기타 필요한 필드
 }
 
 type Attachment struct {
@@ -117,6 +149,45 @@ func (s *SlackSink) Emit(results v1alpha1.ResultSpec, kubegpt v1alpha1.KubegptSp
 	gptMsg := message.Text + message.Attachments[0].Text
 	log.Info(message.Attachments[0].Text)
 	return gptMsg, nil
+}
+
+func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessageBlock {
+	// 캐시 아이템에서 err와 answer 추출
+	errorTextBlock := Block{
+		Type: "section",
+		Text: &TextObject{
+			Type: "mrkdwn",
+			Text: fmt.Sprintf("*해결 되지 않은 에러* %s\n*Error Message:* %s", key, cachedData.Message),
+		},
+	}
+
+	// AI 응답 표시를 위한 텍스트 섹션
+	answerTextBlock := Block{
+		Type: "section",
+		Text: &TextObject{
+			Type: "mrkdwn",
+			Text: fmt.Sprintf("*이전 답변:* %s\n", cachedData.Answer),
+		},
+	}
+	return SlackMessageBlock{
+		Blocks: []Block{errorTextBlock, answerTextBlock},
+	}
+}
+
+func (s *SlackSink) ReEmit(key string, cachedData cache.CacheItem) error {
+	// 캐시 아이템을 사용하여 슬랙 메시지 구성
+	message := RebuildSlackMessage(key, cachedData)
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		log.WithError(err).WithField("component", "SlackSink").Error("Failed to marshal message")
+		return err
+	}
+
+	// 슬랙 클라이언트를 사용하여 메시지 전송
+	SlackClient(s, jsonData, key) // key를 슬랙 메시지의 이름으로 사용
+
+	log.Printf("Successfully sent report to Slack for %v", key)
+	return nil
 }
 
 func SlackClient(s *SlackSink, sendData []byte, sendName string) error {
