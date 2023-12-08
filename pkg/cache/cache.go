@@ -2,6 +2,7 @@ package cache
 
 import (
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
@@ -15,9 +16,11 @@ type Cache struct {
 	Data map[string]CacheItem
 }
 type CacheItem struct {
-	Message   string
-	Answer    string
-	Timestamp time.Time
+	Message    string
+	Answer     string
+	Timestamp  time.Time
+	ErrorTime  time.Time
+	ErrorCount int
 }
 
 func NewCache() *Cache {
@@ -26,11 +29,14 @@ func NewCache() *Cache {
 	}
 }
 
-func (c *Cache) CacheAdd(key, value string) {
+func (c *Cache) CacheAdd(key, value string, count int) {
 	c.Data[key] = CacheItem{
-		Message:   value,
-		Timestamp: time.Now(),
+		Message:    value,
+		Timestamp:  time.Now(),
+		ErrorTime:  time.Now(),
+		ErrorCount: count,
 	}
+	log.Printf("캐시 추가: %v\n", key)
 }
 
 // CacheUpdate 캐시 업데이트 (기존 값 대체)
@@ -38,6 +44,18 @@ func (c *Cache) CacheTimeUpdate(key string) {
 	if item, exists := c.Data[key]; exists {
 		item.Timestamp = time.Now() // 타임스탬프 갱신
 		c.Data[key] = item
+		log.Printf("error 20분 경과: %v\n", key)
+	}
+}
+
+func (c *Cache) CacheErrorTimeUpdate(key string, count int) {
+	if item, exists := c.Data[key]; exists {
+		if item.ErrorCount != count {
+			item.ErrorCount = count
+			item.ErrorTime = time.Now()
+			c.Data[key] = item
+			log.Printf("에러가 발생하여 캐시 업데이트: %v\n", key)
+		}
 	}
 }
 
@@ -65,6 +83,7 @@ func (c *Cache) LoadCacheFromFile(filePath string) error {
 	}
 
 	c.Data = cacheData
+	//log.Printf("캐시 파일 읽기: %v\n", c.Data)
 	return nil
 }
 
@@ -87,6 +106,7 @@ func (c *Cache) Cleanup(currentEvents []string) {
 	for key := range c.Data {
 		if !contains(currentEvents, key) {
 			delete(c.Data, key)
+			log.Printf("에러가 없으므로 캐시 삭제: %v\n", key)
 		}
 	}
 }
