@@ -181,13 +181,13 @@ func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessage {
 				Type:  "mrkdwn",
 				Color: "danger",
 				Title: "해결 되지 않은 에러",
-				Text:  fmt.Sprintf("*%s*\n*Error Message:* %s", key, cachedData.Message),
+				Text:  fmt.Sprintf("*%s*\n*Error Message:* \n%s", key, cachedData.Message),
 			},
 			{
 				Type:  "mrkdwn",
 				Color: "good",
 				Title: "이전 답변",
-				Text:  fmt.Sprintf("*%v*", cachedData.Answer),
+				Text:  fmt.Sprintf("*%s*", cachedData.Answer),
 			},
 		},
 	}
