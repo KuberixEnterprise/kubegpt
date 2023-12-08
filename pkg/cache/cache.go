@@ -59,9 +59,9 @@ func (c *Cache) CacheErrorTimeUpdate(key string, count int) {
 	}
 }
 
-func (c *Cache) CacheGPTUpdate(key string, value []byte) {
+func (c *Cache) CacheGPTUpdate(key string, value string) {
 	if item, exists := c.Data[key]; exists {
-		answer := string(value)
+		answer := value
 		item.Answer = answer
 		c.Data[key] = item
 	}

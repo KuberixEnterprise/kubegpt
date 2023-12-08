@@ -159,7 +159,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 								return
 							}
 							sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
-							cache.CacheGPTUpdate(key, answerData)
+							cache.CacheGPTUpdate(key, answer)
 							cache.SaveCacheToFile(cacheFilePath)
 						}()
 					}
@@ -169,7 +169,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			} else {
 				// 캐시에 이미 있는 경우
 				// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
-				if time.Since(cache.Data[key].Timestamp) > 10*time.Minute {
+				if time.Since(cache.Data[key].Timestamp) > 5*time.Minute {
 					// 20분 경과 했지만 error Count 증가 없는 경우 에러 해결로 판단 pass
 					if time.Since(cache.Data[key].ErrorTime) <= 100*time.Minute {
 						// 슬랙에 새로 보내는 로직
@@ -235,7 +235,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	// reconcile duration 30s
 	//l.Info("Timer 설정", "ErrorInterval", time.Duration(kubegptConfig.Spec.Timer.ErrorInterval)*time.Second)
 	//return ctrl.Result{RequeueAfter: time.Duration(kubegptConfig.Spec.Timer.ErrorInterval) * time.Second}, nil
-	return ctrl.Result{RequeueAfter: time.Duration(5) * time.Second}, nil
+	return ctrl.Result{RequeueAfter: time.Duration(20) * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
