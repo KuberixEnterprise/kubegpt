@@ -171,7 +171,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
 				if time.Since(cache.Data[key].Timestamp) > 10*time.Minute {
 					// 20분 경과 했지만 error Count 증가 없는 경우 에러 해결로 판단 pass
-					if time.Since(cache.Data[key].ErrorTime) <= 5*time.Minute {
+					if time.Since(cache.Data[key].ErrorTime) <= 100*time.Minute {
 						// 슬랙에 새로 보내는 로직
 						// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
 						err := slackSink.ReEmit(key, cache.Data[key])
