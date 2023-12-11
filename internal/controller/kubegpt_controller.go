@@ -19,8 +19,9 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	c "github.com/kuberixenterprise/kubegpt/pkg/cache"
 	"time"
+
+	c "github.com/kuberixenterprise/kubegpt/pkg/cache"
 
 	"github.com/kuberixenterprise/kubegpt/pkg/ai"
 	"github.com/kuberixenterprise/kubegpt/pkg/integrations"
@@ -123,12 +124,12 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			logrus.Error(err, "캐시 읽기 실패")
 			return ctrl.Result{}, err
 		}
-		logrus.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count", len(cache.Data))
+		logrus.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count ", len(cache.Data))
 		var keystore []string
 		for _, result := range resultList.Items {
 			var res corev1alpha1.Result
 			result := result
-			key := result.Spec.Name + "_" + result.Namespace + "_" + result.Kind + "_" + result.Spec.Event[0].Reason
+			key := result.Spec.Name + "_" + result.Spec.Namespace + "_" + result.Spec.Kind + "_" + result.Spec.Event[0].Reason
 			value := result.Spec.Event[0].Message
 			count := int(result.Spec.Event[0].Count)
 			keystore = append(keystore, key)

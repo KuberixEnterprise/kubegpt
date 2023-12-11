@@ -25,4 +25,4 @@ spec:
     endpoint: ""  # input your slack webhook url
   cache:
     enabled: true
-    path: "./tmp/cache"
+    path: "./tmp/cache.json"
