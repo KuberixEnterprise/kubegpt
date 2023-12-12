@@ -129,8 +129,8 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		for _, result := range resultList.Items {
 			var res corev1alpha1.Result
 			result := result
-			key := result.Spec.Name + "_" + result.Spec.Namespace + "_" + result.Spec.Kind + "_" + result.Spec.Event[0].Reason
-			value := result.Spec.Event[0].Message
+			key := result.Spec.Name + "_" + result.Spec.Namespace + "_" + result.Spec.Kind + "_" + result.Spec.Event[0].Message
+			value := result.Spec.Event[0].Reason
 			count := int(result.Spec.Event[0].Count)
 			keystore = append(keystore, key)
 			if !cache.DuplicateEvent(key, value) {
@@ -172,7 +172,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
 				if time.Since(cache.Data[key].Timestamp) > 5*time.Minute {
 					// 20분 경과 했지만 error Count 증가 없는 경우 에러 해결로 판단 pass
-					if time.Since(cache.Data[key].ErrorTime) <= 100*time.Minute {
+					if time.Since(cache.Data[key].ErrorTime) <= 30*time.Minute {
 						// 슬랙에 새로 보내는 로직
 						// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
 						err := slackSink.ReEmit(key, cache.Data[key])
