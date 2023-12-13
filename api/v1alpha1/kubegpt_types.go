@@ -43,10 +43,10 @@ type WebhookRef struct {
 	Endpoint string `json:"endpoint,omitempty"`
 }
 type TimerRef struct {
-	// +kubebuilder: default:=60
+	// +kubebuilder: default:=30
 	ErrorInterval int64 `json:"errorInterval"`
-	// +kubebuilder: default:=60
-	AiInterval int64 `json:"aiInterval"`
+	// +kubebuilder: default:=30
+	SlackInterval int64 `json:"slackInterval"`
 }
 
 type CacheRef struct {
