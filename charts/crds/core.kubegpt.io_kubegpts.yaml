@@ -81,15 +81,15 @@ spec:
                 type: object
               timer:
                 properties:
+                  aiInterval:
+                    format: int64
+                    type: integer
                   errorInterval:
                     format: int64
                     type: integer
-                  slackInterval:
-                    format: int64
-                    type: integer
                 required:
+                - aiInterval
                 - errorInterval
-                - slackInterval
                 type: object
             required:
             - ai

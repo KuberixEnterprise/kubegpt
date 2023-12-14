@@ -19,16 +19,14 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"time"
-
 	c "github.com/kuberixenterprise/kubegpt/pkg/cache"
+	"time"
 
 	"github.com/kuberixenterprise/kubegpt/pkg/ai"
 	"github.com/kuberixenterprise/kubegpt/pkg/integrations"
 	"github.com/kuberixenterprise/kubegpt/pkg/resource"
 	"github.com/kuberixenterprise/kubegpt/pkg/sinks"
 	"github.com/sirupsen/logrus"
-	v1app "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/api/events/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -96,12 +94,6 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				service := &v1.Service{}
 				err = r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, service)
 				obj = service
-			case "Deployment":
-				deployment := &v1app.Deployment{}
-				err = r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, deployment)
-			case "Replicaset":
-				replicaset := &v1app.ReplicaSet{}
-				err = r.Get(ctx, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, replicaset)
 			default:
 				continue
 			}
@@ -131,13 +123,13 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			logrus.Error(err, "캐시 읽기 실패")
 			return ctrl.Result{}, err
 		}
-		logrus.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count ", len(cache.Data))
+		logrus.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count", len(cache.Data))
 		var keystore []string
 		for _, result := range resultList.Items {
 			var res corev1alpha1.Result
 			result := result
-			key := result.Spec.Name + "_" + result.Spec.Namespace + "_" + result.Spec.Kind + "_" + result.Spec.Event[0].Message
-			value := result.Spec.Event[0].Reason
+			key := result.Spec.Name + "_" + result.Namespace + "_" + result.Kind + "_" + result.Spec.Event[0].Reason
+			value := result.Spec.Event[0].Message
 			count := int(result.Spec.Event[0].Count)
 			keystore = append(keystore, key)
 			if !cache.DuplicateEvent(key, value) {
@@ -177,9 +169,9 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			} else {
 				// 캐시에 이미 있는 경우
 				// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
-				if time.Since(cache.Data[key].Timestamp) > time.Duration(kubegptConfig.Spec.Timer.SlackInterval)*time.Minute {
+				if time.Since(cache.Data[key].Timestamp) > 5*time.Minute {
 					// 20분 경과 했지만 error Count 증가 없는 경우 에러 해결로 판단 pass
-					if time.Since(cache.Data[key].ErrorTime) <= time.Duration(10+kubegptConfig.Spec.Timer.SlackInterval)*time.Minute {
+					if time.Since(cache.Data[key].ErrorTime) <= 100*time.Minute {
 						// 슬랙에 새로 보내는 로직
 						// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
 						err := slackSink.ReEmit(key, cache.Data[key])
@@ -210,12 +202,40 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				}
 			}
 		}
-		cache.Cleanup(keystore)
 
+		//l.Info("캐시 조회 (For문 이후) :", "Cache list", cache.Data)
+		cache.Cleanup(keystore)
+		//l.Info("캐시 삭제 후:", "Delete Cache ", cache.Data)
+		//if kubegptConfig.Spec.AI.Enabled {
+		//	for _, result := range resultList.Items {
+		//		var res corev1alpha1.Result
+		//		if err := r.Get(ctx, client.ObjectKey{Name: result.Name, Namespace: result.Namespace}, &res); err == nil {
+		//			l.Error(err, "Result 조회 실패", "name", result.Name, "namespace", result.Namespace)
+		//		}
+		//		if res.Status.Webhook == "" {
+		//			go func() {
+		//				content := tmp.Sprintf("Event: %s\n Count: %v\n Reason: %s\n Message: %s", result.Spec.Event[0].Type, result.Spec.Event[0].Count, result.Spec.Event[0].Reason, result.Spec.Event[0].Message)
+		//				answer := ai.GetAnswer(content, kubegptConfig.Spec)
+		//				answerData, err := json.Marshal(sinks.StringSlackMessage(answer, result.Spec))
+		//				if err != nil {
+		//					l.Error(err, "Failed to marshal message")
+		//					return
+		//				}
+		//				sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
+		//			}()
+		//			result.Status.Webhook = kubegptConfig.Spec.Sink.Endpoint
+		//		} else {
+		//			res.Status.Webhook = ""
+		//		}
+		//	}
+		//}
 	}
 
 	// 결과 상태 업데이트
-	return ctrl.Result{RequeueAfter: time.Duration(kubegptConfig.Spec.Timer.ErrorInterval) * time.Second}, nil
+	// reconcile duration 30s
+	//l.Info("Timer 설정", "ErrorInterval", time.Duration(kubegptConfig.Spec.Timer.ErrorInterval)*time.Second)
+	//return ctrl.Result{RequeueAfter: time.Duration(kubegptConfig.Spec.Timer.ErrorInterval) * time.Second}, nil
+	return ctrl.Result{RequeueAfter: time.Duration(20) * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -225,7 +245,5 @@ func (r *KubegptReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(&v12.Event{}, &handler.EnqueueRequestForObject{}).
 		Watches(&corev1alpha1.Result{}, &handler.EnqueueRequestForObject{}).
 		Watches(&v1.Pod{}, &handler.EnqueueRequestForObject{}).
-		Watches(&v1app.Deployment{}, &handler.EnqueueRequestForObject{}).
-		Watches(&v1app.ReplicaSet{}, &handler.EnqueueRequestForObject{}).
 		Complete(r)
 }
