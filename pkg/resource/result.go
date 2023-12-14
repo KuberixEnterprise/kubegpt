@@ -5,6 +5,7 @@ import (
 
 	"github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	// import to yaml
 	//"k8s.io/apimachinery/pkg/runtime"
@@ -41,7 +42,6 @@ func SerializeObjectAsJSON(ctx context.Context, c client.Client, key client.Obje
 			Kind:      pod.Kind,
 			Name:      pod.Name,
 			Namespace: pod.Namespace,
-			Message:   eventResource.Message,
 		}
 		//// 결과를 JSON으로 직렬화
 		//jsonBytes, err := json.Marshal(result)
@@ -63,11 +63,21 @@ func SerializeObjectAsJSON(ctx context.Context, c client.Client, key client.Obje
 				Event:     []v1alpha1.Event{eventResource},
 			},
 		}
-		store = v1alpha1.Store{
-			Kind:      service.Kind,
-			Name:      service.Name,
-			Namespace: service.Namespace,
-			Message:   eventResource.Message,
+		pods := &v1.PodList{}
+		labelSelector := labels.SelectorFromSet(service.Labels)
+		listOptions := &client.ListOptions{
+			Namespace:     service.Namespace,
+			LabelSelector: labelSelector,
+		}
+		if err := c.List(ctx, pods, listOptions); err != nil {
+			return result, store, err
+		}
+		for _, pod := range pods.Items {
+			store = v1alpha1.Store{
+				Kind:      pod.Kind,
+				Name:      pod.Name,
+				Namespace: pod.Namespace,
+			}
 		}
 		return result, store, nil
 	}
