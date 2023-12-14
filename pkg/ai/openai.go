@@ -2,13 +2,13 @@ package ai
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	b64 "encoding/base64"
 
 	"github.com/kuberixenterprise/kubegpt/api/v1alpha1"
 	openai "github.com/sashabaranov/go-openai"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetAnswer(content string, kubegpt v1alpha1.KubegptSpec) string {
@@ -37,11 +37,10 @@ func GetAnswer(content string, kubegpt v1alpha1.KubegptSpec) string {
 	)
 
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
+		log.Errorf("ChatCompletion error: %v\n", err)
 		return err.Error()
 	}
 
-	// tmp.Println(response.Choices[0].Message.Content)
 	return response.Choices[0].Message.Content
 
 }
