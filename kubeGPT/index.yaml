@@ -34,7 +34,7 @@ entries:
     type: application
     urls:
     - kubegpt-0.1.2.tgz
-    version: 0.1.2
+    version: 0.1.2ㅏ
   - apiVersion: v2
     created: "2023-12-13T13:47:20.243861+09:00"
     description: A Helm chart for Kubernetes
