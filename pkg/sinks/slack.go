@@ -21,6 +21,18 @@ type SlackMessage struct {
 	Attachments []Attachment `json:"attachments"`
 }
 
+type SlackMessageBlock struct {
+	Blocks []Block `json:"blocks"`
+}
+
+type Block struct {
+	Type     string      `json:"type"`
+	Text     *TextObject `json:"text,omitempty"`
+	Fields   []Field     `json:"fields,omitempty"`
+	Elements []Element   `json:"elements,omitempty"`
+	// 기타 필요한 블록 타입별 필드
+}
+
 type TextObject struct {
 	Type string `json:"type"`
 	Text string `json:"text"`
@@ -29,6 +41,15 @@ type TextObject struct {
 type Field struct {
 	Type string `json:"type"`
 	Text string `json:"text"`
+}
+
+type Element struct {
+	Type     string      `json:"type"`
+	Text     *TextObject `json:"text,omitempty"`
+	ActionID string      `json:"action_id,omitempty"`
+	URL      string      `json:"url,omitempty"`
+	Value    string      `json:"value,omitempty"`
+	// 기타 필요한 필드
 }
 
 type Attachment struct {
@@ -129,6 +150,29 @@ func (s *SlackSink) Emit(results v1alpha1.ResultSpec, kubegpt v1alpha1.KubegptSp
 	log.Info(message.Attachments[0].Text)
 	return gptMsg, nil
 }
+
+//func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessageBlock {
+//	// 캐시 아이템에서 err와 answer 추출
+//	errorTextBlock := Block{
+//		Type: "section",
+//		Text: &TextObject{
+//			Type: "mrkdwn",
+//			Text: fmt.Sprintf("*해결 되지 않은 에러* %s\n*Error Message:* %s", key, cachedData.Message),
+//		},
+//	}
+//
+//	// AI 응답 표시를 위한 텍스트 섹션
+//	answerTextBlock := Block{
+//		Type: "section",
+//		Text: &TextObject{
+//			Type: "mrkdwn",
+//			Text: fmt.Sprintf("*이전 답변:* %v\n", cachedData.Answer),
+//		},
+//	}
+//	return SlackMessageBlock{
+//		Blocks: []Block{errorTextBlock, answerTextBlock},
+//	}
+//}
 
 func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessage {
 	return SlackMessage{

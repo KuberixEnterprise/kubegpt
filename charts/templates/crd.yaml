@@ -14,8 +14,8 @@ spec:
       name: "kubegpt-secret"
       key: {{ .Values.ai.token | b64enc | quote }}
   timer:
-    errorInterval: {{ .Values.timer.errorInterval | default 30 }}
-    slackInterval: {{ .Values.timer.slackInterval | default 30 }}
+    errorInterval: {{ .Values.timer.errorInterval | default 60 }}
+    aiInterval: {{ .Values.timer.aiInterval | default 60 }}
   sink:
     type: "slack"
     endpoint: {{ .Values.slack.webhook | quote }}  # input your slack webhook url

@@ -29,6 +29,7 @@ type Store struct {
 	Kind      string `json:"kind"`
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
+	Message   string `json:"message"`
 }
 
 type Event struct {

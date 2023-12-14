@@ -2,10 +2,9 @@ package cache
 
 import (
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {
@@ -78,14 +77,7 @@ func (c *Cache) LoadCacheFromFile(filePath string) error {
 		}
 		return err
 	}
-	// 빈 파일인 경우 데이터 저장 후 리턴
-	if len(fileData) == 0 {
-		c.Data = make(map[string]CacheItem)
-		return nil
-	}
-
 	cacheData := make(map[string]CacheItem)
-
 	if err := json.Unmarshal(fileData, &cacheData); err != nil {
 		return err
 	}
