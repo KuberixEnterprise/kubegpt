@@ -27,6 +27,7 @@ import (
 	"github.com/kuberixenterprise/kubegpt/pkg/integrations"
 	"github.com/kuberixenterprise/kubegpt/pkg/resource"
 	"github.com/kuberixenterprise/kubegpt/pkg/sinks"
+	"github.com/sirupsen/logrus"
 	v1app "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/api/events/v1"
@@ -105,7 +106,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				continue
 			}
 			if err != nil {
-				l.Info("조회 실패 이벤트를 제외합니다.", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
+				logrus.Info("조회 실패 이벤트를 제외합니다.", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
 				continue
 			} else {
 				jsonString, store, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, obj, eventResource)
@@ -127,10 +128,10 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		cache := c.NewCache()
 		err := cache.LoadCacheFromFile(cacheFilePath)
 		if err != nil {
-			l.Error(err, "캐시 읽기 실패")
+			logrus.Error(err, "캐시 읽기 실패")
 			return ctrl.Result{}, err
 		}
-		l.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count ", len(cache.Data))
+		logrus.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count ", len(cache.Data))
 		var keystore []string
 		for _, result := range resultList.Items {
 			var res corev1alpha1.Result
@@ -142,7 +143,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			if !cache.DuplicateEvent(key, value) {
 				cache.CacheAdd(key, value, count)
 				cache.SaveCacheToFile(cacheFilePath)
-				l.Info("캐시 데이터 저장(New Event)", "Add Cache", key)
+				logrus.Info("캐시 데이터 저장(New Event)", "Add Cache", key)
 
 				if err := r.Get(ctx, client.ObjectKey{Name: result.Name, Namespace: result.Namespace}, &res); err == nil {
 					l.Error(err, "Result 조회 실패", "name", result.Name, "namespace", result.Namespace)
@@ -152,7 +153,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 					// 슬랙에 새로 보내는 로직
 					gptMsg, err := slackSink.Emit(result.Spec, kubegptConfig.Spec)
 					if err != nil {
-						l.Error(err, "Sink 발송 실패")
+						logrus.Error(err, "Sink 발송 실패")
 						return ctrl.Result{}, err
 					}
 					result.Status.Webhook = kubegptConfig.Spec.Sink.Endpoint
@@ -162,7 +163,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 							answer := ai.GetAnswer(content, kubegptConfig.Spec)
 							answerData, err := json.Marshal(sinks.StringSlackMessage(answer, result.Spec))
 							if err != nil {
-								l.Error(err, "Failed to marshal message")
+								logrus.Error(err, "Failed to marshal message")
 								return
 							}
 							sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
@@ -183,19 +184,19 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 						// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
 						err := slackSink.ReEmit(key, cache.Data[key])
 						if err != nil {
-							l.Error(err, "Sink 발송 실패")
+							logrus.Error(err, "Sink 발송 실패")
 							return ctrl.Result{}, err
 						}
 						cache.CacheTimeUpdate(key)
 						cache.SaveCacheToFile(cacheFilePath)
-						l.Info("캐시 Timestamp 업데이트", "key", key)
+						logrus.Println("캐시 Timestamp 업데이트", "key", key)
 					} else {
 						if count > cache.Data[key].ErrorCount || count < 10 {
 							// 에러 카운트가 증가한 경우 ErrorTime 업데이트
 							cache.CacheErrorTimeUpdate(key, count)
 						}
 						// 추가 에러가 없으므로 패스
-						l.Info("추가 에러 없으므로 패스:\n", "key", key)
+						logrus.Println("추가 에러 없으므로 패스:\n", "key", key)
 					}
 				} else {
 					// 20분이 지나지 않은 경우
@@ -203,7 +204,8 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 						// 에러 카운트가 증가한 경우 ErrorTime 업데이트
 						cache.CacheErrorTimeUpdate(key, count)
 					}
-					l.Info("duplicate event pass", "cache.Data[key].ErrorCount", cache.Data[key].ErrorCount)
+					logrus.Println("count", count, "cache.Data[key].ErrorCount", cache.Data[key].ErrorCount)
+					logrus.Println("duplicate event pass")
 
 				}
 			}
