@@ -21,6 +21,6 @@ const (
 )
 
 var PromptMap = map[string]string{
-	"default": default_prompt,
-	"english": english_prompt,
+	"kr": default_prompt,
+	"en": english_prompt,
 }
