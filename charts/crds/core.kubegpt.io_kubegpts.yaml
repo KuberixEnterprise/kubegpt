@@ -40,6 +40,8 @@ spec:
                     type: string
                   enabled:
                     type: boolean
+                  language:
+                    type: string
                   model:
                     default: gpt-gpt-4-1106-preview
                     type: string
@@ -56,6 +58,7 @@ spec:
                 required:
                 - backend
                 - enabled
+                - language
                 - model
                 - secret
                 type: object
