@@ -9,6 +9,7 @@ spec:
   ai:
     enabled: {{ .Values.ai.enabled | default true }}
     backend: "openai"
+    language: {{ .Values.ai.language | default "kr" }}
     model: {{ .Values.ai.model | default "gpt-3.5-turbo" }}
     secret:
       name: "kubegpt-secret"
