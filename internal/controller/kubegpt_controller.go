@@ -169,6 +169,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 							sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
 							cache.CacheGPTUpdate(key, answer)
 							cache.SaveCacheToFile(cacheFilePath)
+							logrus.Println("GPT 답변 저장 : ", cache.Data[key], cache.Data[key].Answer)
 						}()
 					}
 				} else {
@@ -196,7 +197,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 							cache.CacheErrorTimeUpdate(key, count)
 						}
 						// 추가 에러가 없으므로 패스
-						logrus.Println("추가 에러 없으므로 패스:\n", "key", key)
+						logrus.Println("추가 에러 없으므로 패스:", "key", key)
 					}
 				} else {
 					// 20분이 지나지 않은 경우
@@ -204,7 +205,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 						// 에러 카운트가 증가한 경우 ErrorTime 업데이트
 						cache.CacheErrorTimeUpdate(key, count)
 					}
-					logrus.Println("duplicate event pass\n", "cache.Data[key].ErrorCount", cache.Data[key].ErrorCount)
+					logrus.Println("duplicate event pass", cache.Data[key], cache.Data[key].ErrorCount)
 
 				}
 			}
