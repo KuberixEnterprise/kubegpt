@@ -16,7 +16,7 @@ func GetAnswer(content string, kubegpt v1alpha1.KubegptSpec) string {
 	// 개행문자 제거
 	token := strings.Replace(string(token64), "\n", "", -1)
 	model := kubegpt.AI.Model
-	promptTmpl := PromptMap["default"]
+	promptTmpl := PromptMap[kubegpt.AI.Language]
 
 	client := openai.NewClient(token)
 	response, err := client.CreateChatCompletion(
@@ -30,7 +30,7 @@ func GetAnswer(content string, kubegpt v1alpha1.KubegptSpec) string {
 				},
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: "문제해결해줘 " + content,
+					Content: content,
 				},
 			},
 		},
