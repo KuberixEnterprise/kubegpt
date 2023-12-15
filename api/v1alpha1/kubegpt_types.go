@@ -28,6 +28,8 @@ type AISpec struct {
 	Enabled bool `json:"enabled"`
 	// +kubebuilder: default:=openai
 	Backend string `json:"backend"`
+	// +kubebuilder: default:=kr
+	Language string `json:"language"`
 	// +kubebuilder:default:=gpt-gpt-4-1106-preview
 	Model  string     `json:"model"`
 	Secret *SecretRef `json:"secret"`
