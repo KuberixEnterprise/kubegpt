@@ -13,7 +13,7 @@ spec:
   ai:
     enabled: true
     backend: "openai"
-    language: "kr"
+    language: "en"
     model: "gpt-4-1106-preview"
     secret:
       name: "kubegpt-secret"
