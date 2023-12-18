@@ -59,7 +59,7 @@ func buildSlackMessage(result v1alpha1.ResultSpec, k8sgptCR string) SlackMessage
 	imagesText := fmt.Sprintf("%v", result.Images)
 
 	return SlackMessage{
-		Text: fmt.Sprintf(">*[%s] %s에 에러가 발생했습니다 : %s %s label: %s image: %s*", k8sgptCR, result.Kind, result.Kind, result.Name, labelsText, imagesText),
+		Text: fmt.Sprintf(">*[%s] Error event occurred in the %s : %s %s \n -Label: %s \n -Image: %s*", k8sgptCR, result.Kind, result.Kind, result.Name, labelsText, imagesText),
 		Attachments: []Attachment{
 			{
 				Type:  "mrkdwn",
@@ -74,7 +74,7 @@ func buildSlackMessage(result v1alpha1.ResultSpec, k8sgptCR string) SlackMessage
 func StringSlackMessage(text string, result v1alpha1.ResultSpec) SlackMessage {
 	var title string
 	for _, event := range result.Event {
-		title += fmt.Sprintf("Event: %s / Count: %v / Reason: %s / Message: %s", event.Type, event.Count, event.Reason, event.Message)
+		title += fmt.Sprintf(">*Event: %s / Count: %v / Reason: %s  \nMessage: %s*", event.Type, event.Count, event.Reason, event.Message)
 	}
 	return SlackMessage{
 		Text: "[Error Message]" + title,
@@ -82,7 +82,7 @@ func StringSlackMessage(text string, result v1alpha1.ResultSpec) SlackMessage {
 			{
 				Type:  "mrkdwn",
 				Color: "good",
-				Title: "ChatGPT 결과",
+				Title: "ChatGPT Answer : ",
 				Text:  text,
 			},
 		},
@@ -172,7 +172,6 @@ func SlackClient(s *SlackSink, sendData []byte, sendName string) error {
 		log.WithError(err).WithField("component", "SlackSink").Error("Error sending HTTP request")
 		return err
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		log.WithField("status", resp.Status).Error("Failed to send report")
