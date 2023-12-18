@@ -40,7 +40,6 @@ func (c *Cache) CacheAdd(key, value string, count int) {
 	log.Printf("캐시 추가: %v\n", key)
 }
 
-// CacheUpdate 캐시 업데이트 (기존 값 대체)
 func (c *Cache) CacheTimeUpdate(key string) {
 	if item, exists := c.Data[key]; exists {
 		item.Timestamp = time.Now() // 타임스탬프 갱신
@@ -68,7 +67,7 @@ func (c *Cache) CacheGPTUpdate(key string, value string) {
 	}
 }
 
-// 설정 파일에 변경된 캐시 데이터 저장
+// Reding cache data from file
 func (c *Cache) LoadCacheFromFile(filePath string) error {
 	fileData, err := os.ReadFile(filePath)
 	if err != nil {
@@ -78,7 +77,7 @@ func (c *Cache) LoadCacheFromFile(filePath string) error {
 		}
 		return err
 	}
-	// 빈 파일인 경우 데이터 저장 후 리턴
+	// If the file is empty, initialize the cache
 	if len(fileData) == 0 {
 		c.Data = make(map[string]CacheItem)
 		return nil
@@ -91,7 +90,6 @@ func (c *Cache) LoadCacheFromFile(filePath string) error {
 	}
 
 	c.Data = cacheData
-	//log.Printf("캐시 파일 읽기: %v\n", c.Data)
 	return nil
 }
 
@@ -114,7 +112,7 @@ func (c *Cache) Cleanup(currentEvents []string) {
 	for key := range c.Data {
 		if !contains(currentEvents, key) {
 			delete(c.Data, key)
-			log.Printf("에러가 없으므로 캐시 삭제: %v\n", key)
+			log.Printf("Delete cache data: %v\n", key)
 		}
 	}
 }

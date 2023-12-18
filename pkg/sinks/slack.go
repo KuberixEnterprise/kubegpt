@@ -90,24 +90,20 @@ func StringSlackMessage(text string, result v1alpha1.ResultSpec) SlackMessage {
 }
 
 func (c *Client) SendHTTPRequest(method, url string, body []byte) (*http.Response, error) {
-	// HTTP 요청 생성
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	if err != nil {
 		log.WithError(err).WithField("component", "HTTPClient").Error("Failed to create HTTP request")
 		return nil, err
 	}
 
-	// 필요한 헤더 설정
 	req.Header.Set("Content-Type", "application/json")
 
-	// HTTP 요청 전송
 	resp, err := c.hclient.Do(req)
 	if err != nil {
 		log.WithError(err).WithField("component", "HTTPClient").Error("Failed to send HTTP request")
 		return nil, err
 	}
 
-	// HTTP 응답 상태 코드 확인 (필요에 따라)
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		log.WithField("status", resp.Status).WithField("component", "HTTPClient").Error("HTTP request returned non-success status")
 		return resp, fmt.Errorf("HTTP request returned non-success status: %s", resp.Status)
@@ -136,13 +132,13 @@ func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessage {
 			{
 				Type:  "mrkdwn",
 				Color: "danger",
-				Title: "해결 되지 않은 에러",
+				Title: "Unresolved errors",
 				Text:  fmt.Sprintf("*%s*\n*Error Message:* \n%s", key, cachedData.Message),
 			},
 			{
 				Type:  "mrkdwn",
 				Color: "good",
-				Title: "이전 답변",
+				Title: "Previous answer",
 				Text:  fmt.Sprintf("*%s*", cachedData.Answer),
 			},
 		},
@@ -150,7 +146,6 @@ func RebuildSlackMessage(key string, cachedData cache.CacheItem) SlackMessage {
 }
 
 func (s *SlackSink) ReEmit(key string, cachedData cache.CacheItem) error {
-	// 캐시 아이템을 사용하여 슬랙 메시지 구성
 	message := RebuildSlackMessage(key, cachedData)
 	jsonData, err := json.Marshal(message)
 	if err != nil {
@@ -158,8 +153,7 @@ func (s *SlackSink) ReEmit(key string, cachedData cache.CacheItem) error {
 		return err
 	}
 
-	// 슬랙 클라이언트를 사용하여 메시지 전송
-	SlackClient(s, jsonData, key) // key를 슬랙 메시지의 이름으로 사용
+	SlackClient(s, jsonData, key) // Send the message to Slack
 
 	log.Printf("Successfully sent report to Slack for %v", key)
 	return nil
@@ -172,7 +166,6 @@ func SlackClient(s *SlackSink, sendData []byte, sendName string) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	//req.Header.Set("Authorization",)
 
 	resp, err := s.Client.hclient.Do(req)
 	if err != nil {

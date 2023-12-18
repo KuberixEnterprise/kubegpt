@@ -8,6 +8,6 @@ spec:
       image: busybox
       resources:
         limits:
-          memory: "1Mi" # 매우 낮은 메모리 제한
-          cpu: "100m" # 매우 낮은 CPU 제한
+          memory: "1Mi" # OOM killer
+          cpu: "100m"
       command: ["sh", "-c", "echo Hello Kubernetes! && sleep 3600"]

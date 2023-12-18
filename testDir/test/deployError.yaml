@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: my-container
-          image: nonexistent-image:latest # 잘못된 이미지 이름
+          image: nonexistent-image:latest # Invalid image
           ports:
-            - containerPort: 80 # 이 포트는 컨테이너에서 열려 있지 않을 수 있음
+            - containerPort: 80
