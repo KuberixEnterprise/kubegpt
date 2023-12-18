@@ -37,10 +37,13 @@ spec:
                 description: Version string  `json:"version"`
                 properties:
                   backend:
+                    default: openai
                     type: string
                   enabled:
+                    default: true
                     type: boolean
                   language:
+                    default: en
                     type: string
                   model:
                     default: gpt-gpt-4-1106-preview

@@ -24,11 +24,11 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 type AISpec struct {
-	// +kubebuilder: default:=true
+	// +kubebuilder:default:=true
 	Enabled bool `json:"enabled"`
-	// +kubebuilder: default:=openai
+	// +kubebuilder:default:=openai
 	Backend string `json:"backend"`
-	// +kubebuilder: default:=kr
+	// +kubebuilder:default:=en
 	Language string `json:"language"`
 	// +kubebuilder:default:=gpt-gpt-4-1106-preview
 	Model  string     `json:"model"`
