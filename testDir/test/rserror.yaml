@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: my-container
-          image: myimage:wrongtag # 잘못된 이미지 태그
+          image: myimage:wrongtag # Invalid image
           resources:
             requests:
               memory: "100Mi"

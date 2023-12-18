@@ -63,7 +63,6 @@ type KubegptReconciler struct {
 func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	l := log.FromContext(ctx)
-	// result list 선언 + 에러 확인
 	kubegptConfig := &corev1alpha1.Kubegpt{}
 	if err := r.Client.Get(ctx, req.NamespacedName, kubegptConfig); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -106,7 +105,7 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				continue
 			}
 			if err != nil {
-				logrus.Info("조회 실패 이벤트를 제외합니다.", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
+				logrus.Info("Exclude failure events", "name", event.Regarding.Name, "namespace", event.Regarding.Namespace)
 				continue
 			} else {
 				jsonString, store, err := resource.SerializeObjectAsJSON(ctx, r.Client, client.ObjectKey{Name: event.Regarding.Name, Namespace: event.Regarding.Namespace}, obj, eventResource)
@@ -122,16 +121,16 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if kubegptConfig.Spec.Sink != nil && kubegptConfig.Spec.Sink.Type != "" && kubegptConfig.Spec.Sink.Endpoint != "" {
-		// sink 설정
+		// sink
 		var slackSink sinks.SlackSink
 		slackSink.Configure(kubegptConfig)
 		cache := c.NewCache()
 		err := cache.LoadCacheFromFile(cacheFilePath)
 		if err != nil {
-			logrus.Error(err, "캐시 읽기 실패")
+			logrus.Error(err, "Cache Read Failed")
 			return ctrl.Result{}, err
 		}
-		logrus.Info("캐시 파일을 읽어 옵니다.", "Load Cache Count ", len(cache.Data))
+		logrus.Info("Reading Cache file.,.", "Load Cache Count ", len(cache.Data))
 		var keystore []string
 		for _, result := range resultList.Items {
 			var res corev1alpha1.Result
@@ -143,17 +142,16 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			if !cache.DuplicateEvent(key, value) {
 				cache.CacheAdd(key, value, count)
 				cache.SaveCacheToFile(cacheFilePath)
-				logrus.Info("캐시 데이터 저장(New Event)", "Add Cache", key)
+				logrus.Info("Store cache data (New Event)", "Add Cache", key)
 
 				if err := r.Get(ctx, client.ObjectKey{Name: result.Name, Namespace: result.Namespace}, &res); err == nil {
-					l.Error(err, "Result 조회 실패", "name", result.Name, "namespace", result.Namespace)
+					l.Error(err, "Failed find result", "name", result.Name, "namespace", result.Namespace)
 				}
 
 				if res.Status.Webhook == "" {
-					// 슬랙에 새로 보내는 로직
 					gptMsg, err := slackSink.Emit(result.Spec, kubegptConfig.Spec)
 					if err != nil {
-						logrus.Error(err, "Sink 발송 실패")
+						logrus.Error(err, "Failed to emit message")
 						return ctrl.Result{}, err
 					}
 					result.Status.Webhook = kubegptConfig.Spec.Sink.Endpoint
@@ -169,43 +167,39 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 							sinks.SlackClient(&slackSink, answerData, "chatGPT Answer")
 							cache.CacheGPTUpdate(key, answer)
 							cache.SaveCacheToFile(cacheFilePath)
-							logrus.Println("GPT 답변 저장 : ", cache.Data[key], cache.Data[key].Answer)
+							logrus.Println("Store GPT Answer : ", cache.Data[key], cache.Data[key].Answer)
 						}()
 					}
 				} else {
 					res.Status.Webhook = ""
 				}
 			} else {
-				// 캐시에 이미 있는 경우
-				// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
+				// If it's already in the cache
+				// If it's been 20 minutes, send to Slack and update cache
 				if time.Since(cache.Data[key].Timestamp) > time.Duration(kubegptConfig.Spec.Timer.SlackInterval)*time.Minute {
-					// 20분 경과 했지만 error Count 증가 없는 경우 에러 해결로 판단 pass
+					// If 20 minutes have passed and the error count hasn't increased, consider the error resolved pass
 					if time.Since(cache.Data[key].ErrorTime) <= time.Duration(10+kubegptConfig.Spec.Timer.SlackInterval)*time.Minute {
-						// 슬랙에 새로 보내는 로직
-						// 20분이 지난 경우 슬랙에 보내고 캐시 업데이트
+						// Logic to send a new message to Slack
+						// Send to Slack if 20 minutes have passed and update cache
 						err := slackSink.ReEmit(key, cache.Data[key])
 						if err != nil {
-							logrus.Error(err, "Sink 발송 실패")
+							logrus.Error(err, "Failed to emit message")
 							return ctrl.Result{}, err
 						}
 						cache.CacheTimeUpdate(key)
 						cache.SaveCacheToFile(cacheFilePath)
-						logrus.Println("캐시 Timestamp 업데이트", "key", key)
+						logrus.Println("Update Cache Timestamp", "key", key)
 					} else {
 						if count > cache.Data[key].ErrorCount || count < 10 {
-							// 에러 카운트가 증가한 경우 ErrorTime 업데이트
 							cache.CacheErrorTimeUpdate(key, count)
 						}
-						// 추가 에러가 없으므로 패스
-						logrus.Println("추가 에러 없으므로 패스:", "key", key)
+						logrus.Println("Duplicate event pass", cache.Data[key], cache.Data[key].ErrorCount)
 					}
 				} else {
-					// 20분이 지나지 않은 경우
 					if count > cache.Data[key].ErrorCount || count < 10 {
-						// 에러 카운트가 증가한 경우 ErrorTime 업데이트
 						cache.CacheErrorTimeUpdate(key, count)
 					}
-					logrus.Println("duplicate event pass", cache.Data[key], cache.Data[key].ErrorCount)
+					logrus.Println("Duplicate event pass", cache.Data[key], cache.Data[key].ErrorCount)
 
 				}
 			}
@@ -214,7 +208,6 @@ func (r *KubegptReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	}
 
-	// 결과 상태 업데이트
 	return ctrl.Result{RequeueAfter: time.Duration(kubegptConfig.Spec.Timer.ErrorInterval) * time.Second}, nil
 }
 

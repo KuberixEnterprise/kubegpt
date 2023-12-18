@@ -1,5 +1,5 @@
 # KubeGPT
-// Kubernetes의 Event를 기반으로 Slack에 Alert를 보내고 오류에 대한 GPT 답변을 받는 Operator
+// Operator sending alerts to Slack based on events in Kubernetes and receiving GPT responses to errors.
 
 ## Getting Started
 
@@ -10,16 +10,16 @@
 - Access to a Kubernetes v1.11.3+ cluster.
 
 ### Slack app setting
-**Slack을 통한 메세지를 받기 위해서는 Slack app 구성이 필요합니다.**
+**To receive messages via Slack, you need to configure the Slack app.**
 
 1. https://api.slack.com/apps 에서 create new app을 선택합니다.
 
-2. From an app manifest를 선택합니다.
+2. Select From an app manifest.
 
-3. 등록을 원하는 woekspace를 선택합니다.
+3. Select the workspace you want to register for.
 
-4. 아래의 JSON을 복사하여 Slack app의 manifest에 붙여넣습니다. ${}에는 원하는 값을 넣어주시면 됩니다.
-```
+4. Copy and paste the JSON below into your Slack app's manifest, replacing ${} with whatever you want.
+``` 
 {
     "display_information": {
         "name": "${APP_NAME}",
@@ -47,18 +47,18 @@
     }
 }
 ```
-5. Install to Workspace로 APP을 추가하고 싶은 Slack 채널을 선택합니다.
+5. Select the Slack channel you want to add the APP to with Install to Workspace.
 
 ![img.png](img/img.png)
 
-6. Incoming Webhooks에서 Webhook URL을 복사합니다.
+6. Under Incoming Webhooks, copy the webhook URL.
 
 ![img_3.png](img/img_3.png)
 ```sh
 export SLACK_WEBHOOK_URL=<Webhook URL>
 ```
 
-> **NOTE**: Slack URL은 외부에 공유되면 안됩니다.
+> **NOTE**: Slack URLs shouldn't be shared externally.
 
 <br>
 
@@ -66,20 +66,20 @@ export SLACK_WEBHOOK_URL=<Webhook URL>
 <br>
 
 ### GPT setting
-**GPT API를 사용하기 위해 API Key를 발급합니다.**
-https://platform.openai.com/api-keys 에서 API Key를 발급받습니다.
-Key를 복사해서 아래의 명령어를 실행합니다.
+**Issue an API key to use the GPT API.**
+Obtain your API key from https://platform.openai.com/api-keys.
+Copy the key and run the code below.
 ```sh
 export OPENAI_API_KEY=<API Key>
 ```
 
->**NOTE**: API Key는 외부에 공유되면 안됩니다.
+>**NOTE**: API keys shouldn't be shared externally.
 
 ### Helm Install
-**Helm Chart 설치**
+**Install Helm Chart**
 
 ```sh
-helm repo add kubegpt https://kuberixenterprise.github.io/kubegpt/
+helm repo add kubegpt https://kuberixenterprise.github.io/kubegpt/kubeGPT
 
 helm repo update
 
@@ -87,28 +87,3 @@ helm install kubegpt  kubegpt/kubegpt -n kubegpt \
 --set slack.webhook=${SLACK_WEBHOOK_URL} --set ai.token=${OPENAI_API_KEY} \
 --create-namespace
 ```
-
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make --help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
-
-Copyright 2023.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
