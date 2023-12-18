@@ -2,7 +2,19 @@ apiVersion: v1
 entries:
   kubegpt:
   - apiVersion: v2
-    created: "2023-12-15T16:37:52.790134+09:00"
+    created: "2023-12-18T16:53:06.376011+09:00"
+    description: A Helm chart for Kubernetes
+    digest: fdbb990421baa659a5f50a0ab07440c1b59a24fd5b563c12817d99d1e0ea3cb3
+    name: kubegpt
+    sources:
+    - https://my-website.com/foo/bar
+    - https://kuberixenterprise.github.io/kubegpt/kubeGPT/
+    type: application
+    urls:
+    - kubegpt-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
+    created: "2023-12-18T16:53:06.375547+09:00"
     description: A Helm chart for Kubernetes
     digest: a426e2586034d88efd856eef0999c81749678d1d81b8931c95d9bd3b475f4864
     name: kubegpt
@@ -14,7 +26,7 @@ entries:
     - kubegpt-1.0.0.tgz
     version: 1.0.0
   - apiVersion: v2
-    created: "2023-12-15T16:37:52.789672+09:00"
+    created: "2023-12-18T16:53:06.374899+09:00"
     description: A Helm chart for Kubernetes
     digest: 1cb2da826a6cdf35f3539c38efaad63390ac5969890d0cc0f7b63836b95c80de
     name: kubegpt
@@ -26,7 +38,7 @@ entries:
     - kubegpt-0.1.4.tgz
     version: 0.1.4
   - apiVersion: v2
-    created: "2023-12-15T16:37:52.789154+09:00"
+    created: "2023-12-18T16:53:06.372125+09:00"
     description: A Helm chart for Kubernetes
     digest: f4fd845269f99a2ad0572edef8e74ba2397fbd62d46067300b8182f6905cec38
     name: kubegpt
@@ -37,7 +49,7 @@ entries:
     - kubegpt-0.1.3.tgz
     version: 0.1.3
   - apiVersion: v2
-    created: "2023-12-15T16:37:52.788614+09:00"
+    created: "2023-12-18T16:53:06.371579+09:00"
     description: A Helm chart for Kubernetes
     digest: 01f6016d14e69d9c10d94d0afbd69fb6ad1621879b765322d56d9daa2e4d431d
     name: kubegpt
@@ -48,7 +60,7 @@ entries:
     - kubegpt-0.1.2.tgz
     version: 0.1.2
   - apiVersion: v2
-    created: "2023-12-15T16:37:52.788061+09:00"
+    created: "2023-12-18T16:53:06.370982+09:00"
     description: A Helm chart for Kubernetes
     digest: 7050e028304ac6363f8b2af5e410a835fb6c910e8a475b6b2aebfbfd6665d4b2
     name: kubegpt
@@ -59,7 +71,7 @@ entries:
     - kubegpt-0.1.1.tgz
     version: 0.1.1
   - apiVersion: v2
-    created: "2023-12-15T16:37:52.787317+09:00"
+    created: "2023-12-18T16:53:06.370394+09:00"
     description: A Helm chart for Kubernetes
     digest: f00eef436b7e5b067292c06018f7267c61945644eb80f140ee780e139ef997a5
     name: kubegpt
@@ -69,4 +81,4 @@ entries:
     urls:
     - kubegpt-0.1.0.tgz
     version: 0.1.0
-generated: "2023-12-15T16:37:52.785731+09:00"
+generated: "2023-12-18T16:53:06.368584+09:00"
