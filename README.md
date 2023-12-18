@@ -1,6 +1,11 @@
 # KubeGPT
 // Operator sending alerts to Slack based on events in Kubernetes and receiving GPT responses to errors.
 
+
+![Kubegpt](https://github.com/KuberixEnterprise/kubegpt/assets/141299912/abff4912-0e4b-455b-aec3-8a952844fcd9)
+
+
+
 ## Getting Started
 
 ### Prerequisites
