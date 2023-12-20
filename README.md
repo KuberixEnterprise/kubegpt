@@ -1,19 +1,32 @@
 # KubeGPT
 // Operator sending alerts to Slack based on events in Kubernetes and receiving GPT responses to errors.
-
+   <br>
 
 ![Kubegpt](https://github.com/KuberixEnterprise/kubegpt/assets/141299912/abff4912-0e4b-455b-aec3-8a952844fcd9)
 
+   <br>
+## Proceess
+![스크린샷 2023-12-20 오전 11 47 15](https://github.com/KuberixEnterprise/kubegpt/assets/141299912/7bdc3dd1-6509-44e6-85d4-9e386fbb76e6)
 
 
+1. Get Event from the Kubernetes API server.
+2. Receive a list of Events as a response from the API server.
+3. Alert Error Events to Slack and store them in Cache.
+4. Extract fields from the Event and query the GPT API.
+5. Receive a response from the GPT.
+6. Post the GPT response to Slack and store it in the cache.
+7. For duplicate events, transmit from the cache to Slack at the predefined intervals.
+
+<br>
 ## Getting Started
-
+<br>
 ### Prerequisites
 - go version v1.20.0+
 - docker version 17.03+.
 - kubectl version v1.11.3+.
 - Access to a Kubernetes v1.11.3+ cluster.
-
+<br>
+   
 ### Slack app setting
 **To receive messages via Slack, you need to configure the Slack app.**
 
