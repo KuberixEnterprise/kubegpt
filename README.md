@@ -20,8 +20,10 @@
 7. For duplicate events, transmit from the cache to Slack at the predefined intervals.
 
 <br>
+
 ## Getting Started
 <br>
+
 ### Prerequisites
 - go version v1.20.0+
 - docker version 17.03+.
